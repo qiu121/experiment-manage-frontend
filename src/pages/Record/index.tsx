@@ -1,8 +1,7 @@
-import { ProCard, ProForm, ProTable } from '@ant-design/pro-components';
-import React, { useEffect, useState } from 'react';
+import {ProCard, ProForm, ProTable} from '@ant-design/pro-components';
+import React, {useEffect, useState} from 'react';
 import * as recordApi from '@/services/api/record';
-import { useModel } from '@umijs/max';
-import { Link } from 'umi';
+import {useModel, Link} from '@umijs/max';
 
 import {
   Button,
@@ -14,27 +13,21 @@ import {
   Popconfirm,
   Tag,
 } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import {QuestionCircleOutlined} from '@ant-design/icons';
 
 
 export default () => {
 
-  const { initialState } = useModel('@@initialState');
+  const {initialState} = useModel('@@initialState');
   const userId = initialState?.currentUser?.userId
   const param: { [key: string]: any; } | undefined = []
   param.push(userId)
-  const [record, setRecord]: any = useState([])
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState('')
   const [modalTitle, setModalTitle] = useState('')
 
   const [form] = ProForm.useForm()
-
-
-  // search
-  const [searchUserameInput, setSearchUserameInput] = useState('')
-
   const [tableList, setTableList] = useState<any>([])
 
 
@@ -55,33 +48,32 @@ export default () => {
     setIsModalOpen(true)
     setModalTitle('修改实验记录')
     setModalStatus('update')
-    form.setFieldsValue({ id: record.id })
-    form.setFieldsValue({ name: record.name })
-    form.setFieldsValue({ username: record.username })
-    form.setFieldsValue({ status: record.status })
-    form.setFieldsValue({ createTime: record.createTime })
-    form.setFieldsValue({ updateTime: record.updateTime })
+    form.setFieldsValue({id: record.id})
+    form.setFieldsValue({name: record.name})
+    form.setFieldsValue({username: record.username})
+    form.setFieldsValue({status: record.status})
+    form.setFieldsValue({createTime: record.createTime})
+    form.setFieldsValue({updateTime: record.updateTime})
   }
 
   const onIdChange = (e: any) => {
-    const { value } = e.target
-    form.setFieldsValue({ id: value })
+    const {value} = e.target
+    form.setFieldsValue({id: value})
   }
 
   const onNameChange = (e: any) => {
-    const { value } = e.target
-    form.setFieldsValue({ name: value })
+    const {value} = e.target
+    form.setFieldsValue({name: value})
   }
 
   const getAllRecord = async () => {
-    const result = await recordApi.listRecord()
+    const result = await recordApi.listRecordByUserId(userId)
+
     if (result.code === 200) {
       const data = result.data.result
 
-      setRecord(data)
       setTableList(data)
     }
-    setSearchUserameInput('')
   }
 
 
@@ -121,7 +113,7 @@ export default () => {
         return (
           <>
             <Button type='dashed' color='blue'>
-              <Link to={`/Management/record/${record.id}`} >{text}</Link>
+              <Link to={`/myRecord/${record.id}`}>{text}</Link>
             </Button>
           </>
         )
@@ -186,17 +178,17 @@ export default () => {
       render: (text: any, reference: any) => {
         return (
           <>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <Button type="primary" onClick={() => {
               showEditModal(reference)
             }}>
               编辑
             </Button>
-            <Divider type="vertical" />
+            <Divider type="vertical"/>
             <Popconfirm
               title='提示'
               description="确认删除该项吗？"
-              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+              icon={<QuestionCircleOutlined style={{color: 'red'}}/>}
               okText="是"
               cancelText="否"
               onConfirm={() => {
@@ -244,7 +236,7 @@ export default () => {
           setIsModalOpen(false)
           form.resetFields()
         },
-        (err) => {
+        (err: any) => {
           console.log(err)
           return
         }
@@ -254,30 +246,6 @@ export default () => {
 
   }
 
-  const filter = (
-    username: any,
-  ) => {
-    const newList = record.filter((item: any) => {
-      let usernameIndex
-
-      if (item.username === undefined) {
-        usernameIndex = 0
-      } else if (username === '' || username === undefined || username === null) {
-        usernameIndex = 1
-      } else {
-        usernameIndex = item.username.indexOf(username)
-      }
-
-      return usernameIndex >= 0
-    })
-    setTableList(newList)
-  }
-
-  const searchConferenceNameChange = (e: any) => {
-    const value = e.target.value
-    setSearchUserameInput(value)
-    filter(value)
-  }
 
   return (
     <>
@@ -291,9 +259,6 @@ export default () => {
             rowKey="id"
             headerTitle={
               <>
-                <Input addonBefore='记录提交人' value={searchUserameInput}
-                  onChange={searchConferenceNameChange}>
-                </Input>
               </>
             }
             toolbar={{
@@ -309,23 +274,23 @@ export default () => {
             search={false}
             pagination={{
               pageSize: 10,
-              onChange: (page) => console.log(page),
+              onChange: (page: any) => console.log(page),
             }}
 
           />
           {/* edit & add */}
           <Modal title={modalTitle} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Form
-              labelCol={{ span: 6 }}
-              wrapperCol={{ span: 16 }}
+              labelCol={{span: 6}}
+              wrapperCol={{span: 16}}
               form={form}
             >
               <Form.Item hidden name="id" label="id">
-                <Input onChange={onIdChange} />
+                <Input onChange={onIdChange}/>
               </Form.Item>
 
-              <Form.Item name="name" label="实验记录名称" rules={[{ required: true }]}>
-                <Input onChange={onNameChange} />
+              <Form.Item name="name" label="实验记录名称" rules={[{required: true}]}>
+                <Input onChange={onNameChange}/>
               </Form.Item>
 
               {/* <Form.Item name="useraame" label="提交人" rules={[{required: true}]}>
@@ -337,7 +302,7 @@ export default () => {
           </Modal>
 
 
-        </ProCard >
+        </ProCard>
       </ProCard>
     </>
   );

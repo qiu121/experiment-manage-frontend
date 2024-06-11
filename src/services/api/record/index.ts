@@ -1,80 +1,48 @@
-import {request} from '@umijs/max';
+import { request } from '@umijs/max';
 
+
+export async function listRecord(options?: { [key: string]: any }) {
+  return request('/backend/api/record/listRecord', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+export async function listRecordByUserId(userId: any) {
+  return request('/backend/api/record/listRecordByUserId', {
+    method: 'GET',
+    ...(userId || {}),
+  });
+}
 
 export async function get(options?: { [key: string]: any }) {
-  return request('/backend/api/conference/get', {
+  return request('/backend/api/record/get', {
     method: 'GET',
     ...(options || {}),
   });
 }
 
-export async function getOwn(options?: { [key: string]: any }) {
-  return request('/backend/api/reward/getOwn', {
-    method: 'GET',
-    ...(options || {}),
-  });
-}
-
-export async function getById(options?: { [key: string]: any }) {
-  return request('/backend/api/conference/getById' + '?ids=' + options, {
-    method: 'GET',
-    ...(options || {}),
-  });
-}
-
-// export async function getByUserId(options?: { [key: string]: any }) {
-//   return request('/backend/api/reward/getByUserId', {
-//     method: 'GET',
-//     ...(options || {}),
-//   });
-// }
 
 export async function add(options?: { [key: string]: any }) {
-  return request('/backend/api/conference/add', {
+  return request('/backend/api/record/add', {
     method: 'POST',
     ...(options || {}),
   });
 }
 
 export async function update(options?: { [key: string]: any }) {
-  return request('/backend/api/conference/update', {
+  return request('/backend/api/record/update', {
     method: 'PUT',
     ...(options || {}),
   });
 }
 
 
-export async function del(id?: { [key: string]: any }) {
-  return request('/backend/api/conference/del/' + id, {
+export async function del(id?: any) {
+  return request(`/backend/api/record/del/${id}`, {
     method: 'DELETE',
     ...(id || {}),
   });
 }
-
-
-export async function delAttachment(options?: { [key: string]: any }) {
-  return request('/backend/api/conference/delAttachment', {
-    method: 'POST',
-    ...(options || {}),
-  });
-}
-
-
-export async function upload(options?: { [key: string]: any }) {
-  return request('/backend/api/conference/upload', {
-    method: 'POST',
-    requestType: 'form',
-    ...(options || {}),
-  });
-}
-
-
-// export async function exportLog(options?: { [key: string]: any }) {
-//   return request('/backend/api/reward/exportLog?' + 'searchName=1&type=1', {
-//     method: 'GET',
-//     requestType: 'form',
-//     ...(options || {}),
-//   });
-// }
 
 

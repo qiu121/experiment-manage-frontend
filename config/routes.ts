@@ -41,13 +41,11 @@ export default [
       {
         path: '/system/account',
         name: 'accountManagement',
-        icon: 'smile',
         component: './Management/Account',
       },
       {
         path: '/system/sampleType',
         name: 'sampleTypeManagement',
-        icon: 'smile',
         component: './Management/SampleType',
       },
 
@@ -58,18 +56,31 @@ export default [
   {
     path: '/management/record',
     name: 'management.record',
-    icon: 'team',
+    icon: 'experiment',
     access: 'projectManagement',
     component: './Management/Record',
   },
 
-  // {
-  //   path: '/myProject',
-  //   name: 'project',
-  //   icon: 'project',
-  //   access: 'myProject',
-  //   component: './Project',
-  // },
+  {
+    path: '/management/record/:recordId',
+    access: 'projectManagement',
+    component: './Management/SoilSample',
+  },
+
+  {
+    path: '/myRecord',
+    name: 'management.record',
+    icon: 'experiment',
+    access: 'myProject',
+    component: './Record',
+  },
+
+  {
+    path: '/myRecord/:recordId',
+    access: 'myProject',
+    component: './SoilSample',
+  },
+
 
 
   {

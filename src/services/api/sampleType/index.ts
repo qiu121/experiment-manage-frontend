@@ -24,8 +24,8 @@ export async function update(options?: { [key: string]: any }) {
 }
 
 
-export async function del(id?: { [key: string]: any }) {
-  return request('/backend/api/sampleType/del/' + id, {
+export async function del(id?:any) {
+  return request(`/backend/api/sampleType/del/${id}`, {
     method: 'DELETE',
     ...(id || {}),
   });

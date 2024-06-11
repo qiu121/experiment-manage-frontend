@@ -1,10 +1,9 @@
-import {ProCard, ProForm, ProTable} from '@ant-design/pro-components';
-import React, {useEffect, useState} from 'react';
+import { ProCard, ProForm, ProTable } from '@ant-design/pro-components';
+import React, { useEffect, useState } from 'react';
 import * as sampleTypeApi from '@/services/api/sampleType';
-import {useModel} from '@umijs/max';
+import { useModel } from '@umijs/max';
 import {
   Button,
-  Col,
   Divider,
   Form,
   Input,
@@ -12,14 +11,14 @@ import {
   Modal,
   Popconfirm,
   Row,
+  Tag,
 } from 'antd';
-import dayjs from 'dayjs'
-import {QuestionCircleOutlined} from '@ant-design/icons';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 
 export default () => {
 
-  const {initialState} = useModel('@@initialState');
+  const { initialState } = useModel('@@initialState');
   const userId = initialState?.currentUser?.userId
   const param: { [key: string]: any; } | undefined = []
   param.push(userId)
@@ -33,11 +32,7 @@ export default () => {
 
 
   // search
-  const [searchHostNameInput, setSearchHostNameInput] = useState('')
-  const [searchSampleTypeNameInput, setSearchConferenceNameInput] = useState('')
-
-  const [searchTimeStart, setSearchTimeStart] = useState()
-  const [searchTimeEnd, setSearchTimeEnd] = useState()
+  const [searchSampleTypeNameInput, setSearchSampleTypeNameInput] = useState('')
   const [tableList, setTableList] = useState<any>([])
 
 
@@ -58,22 +53,20 @@ export default () => {
     setIsModalOpen(true)
     setModalTitle('修改样本类型')
     setModalStatus('update')
-    form.setFieldsValue({id: sampleType.id})
-    form.setFieldsValue({name: sampleType.name})
+    form.setFieldsValue({ id: sampleType.id })
+    form.setFieldsValue({ sampleTypeName: sampleType.sampleTypeName })
 
   }
 
   const onIdChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({id: value})
+    const { value } = e.target
+    form.setFieldsValue({ id: value })
   }
 
-
-  const onNameChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({name: value})
+  const onSampleTypeNameChange = (e: any) => {
+    const { value } = e.target
+    form.setFieldsValue({ sampleTypeName: value })
   }
-
 
   const listSampleType = async () => {
     const result = await sampleTypeApi.list(param)
@@ -83,16 +76,13 @@ export default () => {
       setSampleType(data)
       setTableList(data)
     }
-    setSearchHostNameInput('')
-    setSearchConferenceNameInput('')
-    setSearchTimeStart(undefined)
-    setSearchTimeEnd(undefined)
+    setSearchSampleTypeNameInput('')
   }
 
 
   useEffect(() => {
     listSampleType().then(data => {
-      console.log(data)
+      // console.log(data)
     })
   }, [])
 
@@ -110,10 +100,15 @@ export default () => {
   const columns: any = [
     {
       title: '样本类型',
-      key: 'name',
-      dataIndex: 'name',
+      key: 'sampleTypeName',
+      dataIndex: 'sampleTypeName',
       search: false,
-      align: 'center'
+      align: 'center',
+      render: (text: any) => {
+        return (
+          <Tag color='cyan'>{text}</Tag>
+        )
+      }
     },
     {
       title: '创建时间',
@@ -139,17 +134,17 @@ export default () => {
       render: (text: any, sampleType: any) => {
         return (
           <>
-            <Divider type="vertical"/>
+            <Divider type="vertical" />
             <Button type="primary" onClick={() => {
               showEditModal(sampleType)
             }}>
               编辑
             </Button>
-            <Divider type="vertical"/>
+            <Divider type="vertical" />
             <Popconfirm
               title='提示'
               description="确认删除该项吗？"
-              icon={<QuestionCircleOutlined style={{color: 'red'}}/>}
+              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
               okText="是"
               cancelText="否"
               onConfirm={() => {
@@ -189,6 +184,7 @@ export default () => {
           const param = {
             data: formDataObj
           }
+
           await sampleTypeApi.add(param);
           await listSampleType()
           setModalStatus('')
@@ -206,58 +202,32 @@ export default () => {
 
 
   const filter = (
-    hostName: any,
-    conferenceName: any,
-    timeStart: any,
-    timeEnd: any
+    typeName: any,
   ) => {
-
     const newList = sampleType.filter((item: any) => {
-      let hostNameIndex, conferenceNameIndex
+      let sampleTypeNameIndex
 
-      if (item.host === undefined) {
-        hostNameIndex = 0
-      } else if (hostName === '' || hostName === undefined || hostName === null) {
-        hostNameIndex = 1
+      if (item.sampleTypeName === undefined) {
+        sampleTypeNameIndex = 0
+      } else if (typeName === '' || typeName === undefined || typeName === null) {
+        sampleTypeNameIndex = 1
       } else {
-        hostNameIndex = item.host?.indexOf(hostName)
+        sampleTypeNameIndex = item.sampleTypeName.indexOf(typeName)
       }
-
-      if (item.name === undefined) {
-        conferenceNameIndex = 0
-      } else if (conferenceName === '' || conferenceName === undefined || conferenceName === null) {
-        conferenceNameIndex = 1
-      } else {
-        conferenceNameIndex = item.name.indexOf(conferenceName)
-      }
-
-      const startValid = timeStart === undefined || timeStart === null ? true : dayjs(item.publicationTime).isAfter(timeStart)
-      const endValid = timeEnd === undefined || timeEnd === null ? true : dayjs(item.publicationTime).isBefore(timeEnd)
-      const timeValid = startValid && endValid
-      return hostNameIndex >= 0
-        && conferenceNameIndex >= 0
-        && timeValid;
+      return sampleTypeNameIndex >= 0
     })
     setTableList(newList)
   }
 
   const searchSampleTypeNameChange = (e: any) => {
     const value = e.target.value
-    setSearchConferenceNameInput(value)
-    filter(searchHostNameInput, value, searchTimeStart, searchTimeEnd)
+    setSearchSampleTypeNameInput(value)
+    filter(value)
   }
 
 
   return (
     <>
-      <ProCard boxShadow>
-        <Row gutter={16}>
-          <Col className="gutter-row" span={4}>
-            <Input addonBefore='样本类型' value={searchSampleTypeNameInput}
-                   onChange={searchSampleTypeNameChange}></Input>
-          </Col>
-        </Row>
-      </ProCard>
 
       <ProCard boxShadow split="vertical">
 
@@ -268,6 +238,8 @@ export default () => {
             rowKey="id"
             headerTitle={
               <>
+                <Input addonBefore='样本类型' value={searchSampleTypeNameInput}
+                  onChange={searchSampleTypeNameChange}></Input>
               </>
             }
             toolbar={{
@@ -288,16 +260,16 @@ export default () => {
           {/* edit & add */}
           <Modal title={modalTitle} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Form
-              labelCol={{span: 6}}
-              wrapperCol={{span: 16}}
+              labelCol={{ span: 6 }}
+              wrapperCol={{ span: 16 }}
               form={form}
             >
               <Form.Item hidden name="id" label="id">
-                <Input onChange={onIdChange}/>
+                <Input onChange={onIdChange} />
               </Form.Item>
 
-              <Form.Item name="name" label="样本类型" rules={[{required: true}]}>
-                <Input onChange={onNameChange}/>
+              <Form.Item name="sampleTypeName" label="样本类型" rules={[{ required: true }]}>
+                <Input onChange={onSampleTypeNameChange} />
               </Form.Item>
 
             </Form>
