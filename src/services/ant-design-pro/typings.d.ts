@@ -11,6 +11,7 @@ declare namespace API {
     email?: string;
     country?: string;
     access?: string;
+    role?: any;
     permissions: Permission[];
   };
 
@@ -19,7 +20,6 @@ declare namespace API {
     permissionName?: string;
     permissionCode?: string;
   };
-
 
   type LoginResult = {
     code?: number;

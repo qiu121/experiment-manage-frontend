@@ -12,58 +12,64 @@
  */
 export default [
   {
-    path: '/user',
-    layout: false,
-    routes: [
-      {
-        name: 'login',
-        path: '/user/login',
-        component: './User/Login',
-      },
-    ],
+    path: '/home',
+    name: 'welcome',
+    icon: 'HomeOutlined',
+    component: './Welcome'
   },
 
+  {
+    name: 'login',
+    path: '/login',
+    layout: false,
+    component: './Login',
+  },
 
   {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
+    path: '/user',
+    name: '用户相关',
+    hideInMenu: true,
+    routes: [
+      {
+        name: '个人中心',
+        hideInMenu: true,
+        access: "user",
+        path: '/user/center',
+        component: './User/Center',
+      },
+    ],
   },
 
   {
     path: '/system',
     name: 'systemManagement',
     icon: 'tool',
-    access: 'projectManagement',
+    access: 'AccountManagement',
     routes: [
-      // account
       {
-        path: '/system/account',
+        path: '/system/userInfo',
         name: 'accountManagement',
-        component: './Management/Account',
+        component: './System/UserInfo',
       },
       {
         path: '/system/sampleType',
         name: 'sampleTypeManagement',
         component: './Management/SampleType',
-      },
-
+      }
     ],
   },
-
 
   {
     path: '/management/record',
     name: 'management.record',
     icon: 'experiment',
-    access: 'projectManagement',
+    access: 'AccountManagement',
     component: './Management/Record',
   },
 
   {
     path: '/management/record/:recordId',
-    access: 'projectManagement',
+    access: 'AccountManagement',
     component: './Management/SoilSample',
   },
 
@@ -71,34 +77,23 @@ export default [
     path: '/myRecord',
     name: 'management.record',
     icon: 'experiment',
-    access: 'myProject',
+    access: 'MyProject',
     component: './Record',
   },
 
   {
     path: '/myRecord/:recordId',
-    access: 'myProject',
+    access: 'MyProject',
     component: './SoilSample',
   },
-
-
-
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/home',
   },
+
   {
     path: '*',
     layout: false,
     component: './404',
   },
-
-  // info
-  {
-    path: '/userInfo',
-    name: 'userInfo',
-    icon: 'user',
-    component: './UserInfo',
-  },
-
 ];

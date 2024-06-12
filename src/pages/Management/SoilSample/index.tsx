@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {useParams, Link} from 'umi';
-import {ProCard, ProForm, ProTable} from '@ant-design/pro-components';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'umi';
+import { ProCard, ProForm, ProTable } from '@ant-design/pro-components';
 import * as soilSampleApi from '@/services/api/soilSample';
 import * as sampleTypeApi from '@/services/api/sampleType';
-import {useModel} from '@umijs/max';
+import { useModel } from '@umijs/max';
 
 import {
   Button,
@@ -18,13 +18,13 @@ import {
   Tag,
   InputNumber
 } from 'antd';
-import {QuestionCircleOutlined} from '@ant-design/icons';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 
 export default () => {
 
 
-  const {initialState} = useModel('@@initialState');
+  const { initialState } = useModel('@@initialState');
   const userId = initialState?.currentUser?.userId
   const param: { [key: string]: any; } | undefined = []
   param.push(userId)
@@ -38,6 +38,9 @@ export default () => {
   const [tableList, setTableList] = useState<any>([])
   const recordIdParam = useParams()
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -49,7 +52,7 @@ export default () => {
     setIsModalOpen(true);
     setModalTitle('新增样本记录')
     setModalStatus('add')
-    form.setFieldsValue({recordId: recordIdParam.recordId})
+    form.setFieldsValue({ recordId: recordIdParam.recordId })
   };
 
 
@@ -57,78 +60,81 @@ export default () => {
     setIsModalOpen(true)
     setModalTitle('修改样本记录')
     setModalStatus('update')
-    form.setFieldsValue({id: soilSample.id})
-    form.setFieldsValue({sampleName: soilSample.sampleName})
-    form.setFieldsValue({color: soilSample.color})
-    form.setFieldsValue({smell: soilSample.smell})
-    form.setFieldsValue({organism: soilSample.organism})
-    form.setFieldsValue({hardness: soilSample.hardness})
-    form.setFieldsValue({sizeGt2mm: soilSample.sizeGt2mm})
-    form.setFieldsValue({sizeLt2mm: soilSample.sizeLt2mm})
-    form.setFieldsValue({viscosity: soilSample.viscosity})
-    form.setFieldsValue({density: soilSample.density})
-    form.setFieldsValue({humidity: soilSample.humidity})
-    form.setFieldsValue({waterRetention: soilSample.waterRetention})
-    form.setFieldsValue({sampleTypeId: soilSample.sampleTypeId})
+    form.setFieldsValue({ id: soilSample.id })
+    form.setFieldsValue({ sampleName: soilSample.sampleName })
+    form.setFieldsValue({ color: soilSample.color })
+    form.setFieldsValue({ smell: soilSample.smell })
+    form.setFieldsValue({ organism: soilSample.organism })
+    form.setFieldsValue({ hardness: soilSample.hardness })
+    form.setFieldsValue({ sizeGt2mm: soilSample.sizeGt2mm })
+    form.setFieldsValue({ sizeLt2mm: soilSample.sizeLt2mm })
+    form.setFieldsValue({ viscosity: soilSample.viscosity })
+    form.setFieldsValue({ density: soilSample.density })
+    form.setFieldsValue({ humidity: soilSample.humidity })
+    form.setFieldsValue({ waterRetention: soilSample.waterRetention })
+    form.setFieldsValue({ sampleTypeId: soilSample.sampleTypeId })
     // form.setFieldsValue({ sampleTypeName: soilSample.sampleTypeName })
 
-    form.setFieldsValue({recordId: recordIdParam.recordId})
+    form.setFieldsValue({ recordId: recordIdParam.recordId })
   }
 
   const onIdChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({id: value})
+    const { value } = e.target
+    form.setFieldsValue({ id: value })
   }
 
   const onSampleNameChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({sampleName: value})
+    const { value } = e.target
+    form.setFieldsValue({ sampleName: value })
   }
   const onSampleTypeNameChange = (e: any) => {
-    form.setFieldsValue({sampleTypeId: e})
+    form.setFieldsValue({ sampleTypeId: e })
   }
   const onColorChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({color: value})
+    const { value } = e.target
+    form.setFieldsValue({ color: value })
   }
   const onSmellChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({smell: value})
+    const { value } = e.target
+    form.setFieldsValue({ smell: value })
   }
   const onOrganismChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({organism: value})
+    const { value } = e.target
+    form.setFieldsValue({ organism: value })
   }
   const onHardnessChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({hardness: value})
+    const { value } = e.target
+    form.setFieldsValue({ hardness: value })
   }
   const onSizeGt2mmChange = (e: any) => {
-    form.setFieldsValue({sizeGt2mm: e})
+    form.setFieldsValue({ sizeGt2mm: e })
   }
   const onSizeLt2mmChange = (e: any) => {
-    form.setFieldsValue({sizeLt2mm: e})
+    form.setFieldsValue({ sizeLt2mm: e })
   }
   const onViscosityChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({viscosity: value})
+    const { value } = e.target
+    form.setFieldsValue({ viscosity: value })
   }
   const onHumidityChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({humidity: value})
+    const { value } = e.target
+    form.setFieldsValue({ humidity: value })
   }
   const onDensityChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({density: value})
+    const { value } = e.target
+    form.setFieldsValue({ density: value })
   }
   const onWaterRetentionChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({waterRetention: value})
+    const { value } = e.target
+    form.setFieldsValue({ waterRetention: value })
   }
 
 
   const getAllSoilSample = async () => {
-    const result = await soilSampleApi.list(recordIdParam.recordId)
+    const page = { currentPage, pageSize }
+    console.log(page);
+
+    const result = await soilSampleApi.list(page, recordIdParam.recordId)
     // console.log(recordIdParam);
     // console.log(typeof recordIdParam);
     // console.log(typeof recordIdParam.recordId);
@@ -299,17 +305,17 @@ export default () => {
         return (
           <>
 
-            <Divider type="vertical"/>
+            <Divider type="vertical" />
             <Button type="primary" onClick={() => {
               showEditModal(soilSample)
             }}>
               编辑
             </Button>
-            <Divider type="vertical"/>
+            <Divider type="vertical" />
             <Popconfirm
               title='提示'
               description="确认删除该项吗？"
-              icon={<QuestionCircleOutlined style={{color: 'red'}}/>}
+              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
               okText="是"
               cancelText="否"
               onConfirm={() => {
@@ -378,7 +384,7 @@ export default () => {
         items={[
           {
             // title: "实验记录管理",
-            title: <Link to="/Management/record">实验记录管理</Link>,
+            title: <Link to="/management/record">实验记录管理</Link>,
           },
           {
             title: "样本记录详情",
@@ -406,28 +412,36 @@ export default () => {
             }}
 
             search={false}
-            pagination={{
-              pageSize: 10,
-              onChange: (page) => console.log(page),
-            }}
+            pagination={
+              {
+                pageSize: pageSize,
+                current: currentPage,
+                hideOnSinglePage: false,
+                onChange: (page) => {
+                  console.log(page)
+                  console.log(pageSize);
+                  console.log(currentPage);
+                }
+              }
+            }
 
           />
           {/* edit & add */}
           <Modal title={modalTitle} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Form
-              labelCol={{span: 6}}
-              wrapperCol={{span: 16}}
+              labelCol={{ span: 6 }}
+              wrapperCol={{ span: 16 }}
               form={form}
             >
               <Form.Item hidden name="id" label="id">
-                <Input onChange={onIdChange}/>
+                <Input onChange={onIdChange} />
               </Form.Item>
 
-              <Form.Item name="sampleName" label="样本名称" rules={[{required: true}]}>
-                <Input onChange={onSampleNameChange}/>
+              <Form.Item name="sampleName" label="样本名称" rules={[{ required: true }]}>
+                <Input onChange={onSampleNameChange} />
               </Form.Item>
 
-              <Form.Item name="sampleTypeId" label="样本类型" rules={[{required: true, message: '请选择样本类型'}]}>
+              <Form.Item name="sampleTypeId" label="样本类型" rules={[{ required: true, message: '请选择样本类型' }]}>
                 <Select
                   // loading={loading}
                   optionFilterProp="children"
@@ -439,24 +453,24 @@ export default () => {
                 />
               </Form.Item>
 
-              <Form.Item name="color" label="颜色" rules={[{required: true}]}>
-                <Input onChange={onColorChange}/>
+              <Form.Item name="color" label="颜色" rules={[{ required: true }]}>
+                <Input onChange={onColorChange} />
               </Form.Item>
 
-              <Form.Item name="smell" label="气味" rules={[{required: true}]}>
-                <Input onChange={onSmellChange}/>
+              <Form.Item name="smell" label="气味" rules={[{ required: true }]}>
+                <Input onChange={onSmellChange} />
 
               </Form.Item>
-              <Form.Item name="organism" label="生物种类" rules={[{required: true}]}>
-                <Input onChange={onOrganismChange}/>
+              <Form.Item name="organism" label="生物种类" rules={[{ required: true }]}>
+                <Input onChange={onOrganismChange} />
 
               </Form.Item>
 
-              <Form.Item name="hardness" label="颗粒硬度" rules={[{required: true}]}>
-                <Input onChange={onHardnessChange}/>
+              <Form.Item name="hardness" label="颗粒硬度" rules={[{ required: true }]}>
+                <Input onChange={onHardnessChange} />
               </Form.Item>
 
-              <Form.Item name="sizeGt2mm" label="颗粒大小(>2mm)" rules={[{required: true}]}>
+              <Form.Item name="sizeGt2mm" label="颗粒大小(>2mm)" rules={[{ required: true }]}>
                 <InputNumber<string>
                   // defaultValue="1.00"
                   // style={{ width: 100 }}
@@ -468,7 +482,7 @@ export default () => {
                 />
               </Form.Item>
 
-              <Form.Item name="sizeLt2mm" label="颗粒大小(<2mm)" rules={[{required: true}]}>
+              <Form.Item name="sizeLt2mm" label="颗粒大小(<2mm)" rules={[{ required: true }]}>
                 <InputNumber<string>
                   // defaultValue="1.00"
                   // style={{ width: 100 }}
@@ -480,20 +494,20 @@ export default () => {
                 />
               </Form.Item>
 
-              <Form.Item name="viscosity" label="黏度" rules={[{required: true}]}>
-                <Input onChange={onViscosityChange}/>
+              <Form.Item name="viscosity" label="黏度" rules={[{ required: true }]}>
+                <Input onChange={onViscosityChange} />
               </Form.Item>
 
-              <Form.Item name="humidity" label="湿度" rules={[{required: true}]}>
-                <Input onChange={onHumidityChange}/>
+              <Form.Item name="humidity" label="湿度" rules={[{ required: true }]}>
+                <Input onChange={onHumidityChange} />
               </Form.Item>
 
-              <Form.Item name="density" label="紧实度" rules={[{required: true}]}>
-                <Input onChange={onDensityChange}/>
+              <Form.Item name="density" label="紧实度" rules={[{ required: true }]}>
+                <Input onChange={onDensityChange} />
               </Form.Item>
 
-              <Form.Item name="waterRetention" label="保水性" rules={[{required: true}]}>
-                <Input onChange={onWaterRetentionChange}/>
+              <Form.Item name="waterRetention" label="保水性" rules={[{ required: true }]}>
+                <Input onChange={onWaterRetentionChange} />
               </Form.Item>
 
             </Form>

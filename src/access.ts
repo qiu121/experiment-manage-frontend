@@ -2,14 +2,14 @@
  * @see https://umijs.org/zh-CN/plugins/plugin-access
  * */
 export default function access(initialState: { currentUser?: API.CurrentUser } | undefined) {
-  const { currentUser } : any = initialState ?? {};
+  const { currentUser } = initialState ?? {};
 
   if (currentUser === undefined) return {};
 
-  const permissionMap : any = {};
+  const permissionMap = {};
   for (let item of currentUser?.permissions) {
-      permissionMap[item?.permissionCode] = true;
+    permissionMap[item.permissionCode] = true;
   }
-
+  console.log(permissionMap);
   return permissionMap;
 }

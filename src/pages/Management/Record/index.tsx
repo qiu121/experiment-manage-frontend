@@ -121,7 +121,7 @@ export default () => {
         return (
           <>
             <Button type='dashed' color='blue'>
-              <Link to={`/Management/record/${record.id}`} >{text}</Link>
+              <Link to={`/management/record/${record.id}`} >{text}</Link>
             </Button>
           </>
         )

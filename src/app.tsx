@@ -1,4 +1,4 @@
-import { AvatarDropdown, AvatarName, Question, SelectLang } from '@/components';
+import { AvatarDropdown, AvatarName, Footer, SelectLang } from '@/components';
 import { currentUser as queryCurrentUser } from '@/services/api/user/userApi';
 import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
@@ -7,10 +7,11 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import { Link, history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
-
 const isDev = process.env.NODE_ENV === 'development';
 
-const loginPath = "/user/login"
+// 免权限打开
+const passPaths = ['/login']
+const loginPath = "/login"
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -29,14 +30,13 @@ export async function getInitialState(): Promise<{
       });
       return msg.data.userInfo;
     } catch (error) {
-      // console.log(error)
       history.push(loginPath);
     }
     return undefined;
   };
   // 如果不是登录页面，执行
   const { location } = history;
-  if (location.pathname !== loginPath) {
+  if (!passPaths.includes(location.pathname)) {
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
@@ -52,9 +52,8 @@ export async function getInitialState(): Promise<{
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
-
   return {
-    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" /> ],
+    actionsRender: () => [<SelectLang key="SelectLang" />],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -65,8 +64,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     waterMarkProps: {
       content: initialState?.currentUser?.name,
     },
-    footerRender: () => <></>,
-    // footerRender: () => <Footer />,
+    footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login

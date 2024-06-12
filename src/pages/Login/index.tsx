@@ -1,5 +1,4 @@
 import { Footer } from '@/components';
-// import { login } from '@/services/ant-design-pro/api';
 import { login } from '@/services/api/loginApi';
 
 import {
@@ -12,7 +11,9 @@ import { FormattedMessage, Helmet, SelectLang, history, useIntl, useModel } from
 import { Alert, Tabs, message } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
-import Settings from '../../../../config/defaultSettings';
+import md5 from 'js-md5';
+import Settings from '../../../config/defaultSettings';
+
 const Lang = () => {
   const langClassName = useEmotionCss(({ token }) => {
     return {
@@ -61,8 +62,7 @@ const Login: React.FC = () => {
       flexDirection: 'column',
       height: '100vh',
       overflow: 'auto',
-      backgroundImage:
-        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+      backgroundImage: "url(/login_back.png)",
       backgroundSize: '100% 100%',
     };
   });
@@ -84,16 +84,18 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const msg = await login({ ...values });
-      if (msg.code === 200) {``
+      const { userName, passWord } = values;
+      // console.log(md5(passWord));
+      const res = await login({ userName: userName, passWord: md5(passWord) });
+      if (res.code === 200) {
         message.success('登录成功！');
-        localStorage.setItem('token', msg.data.token);
+        localStorage.setItem('token', res.data.token);
         await fetchUserInfo();
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
+        // const urlParams = new URL(window.location.href).searchParams;
+        history.push('/');
         return;
       }
-      setErrorMessage(msg.data.message);
+      setErrorMessage(res.msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -127,7 +129,7 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title="科研管理系统"
+          title={Settings.title}
           initialValues={{
             autoLogin: true,
           }}
@@ -163,7 +165,7 @@ const Login: React.FC = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名:',
+                  defaultMessage: '用户名: admin or user',
                 })}
                 rules={[
                   {
@@ -178,14 +180,14 @@ const Login: React.FC = () => {
                 ]}
               />
               <ProFormText.Password
-                name="password"
+                name="passWord"
                 fieldProps={{
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码:',
+                  defaultMessage: '密码',
                 })}
                 rules={[
                   {

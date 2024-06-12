@@ -1,9 +1,10 @@
 import { request } from '@umijs/max';
 
 
-export async function list(recordId: any) {
+export async function list(page: any, recordId: any) {
   return request(`/backend/api/soilSample/list/${recordId}`, {
-    method: 'GET',
+    method: 'POST',
+    data: page,
     ...(recordId || {}),
   });
 }
