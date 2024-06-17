@@ -88,7 +88,7 @@ const Welcome: React.FC = () => {
   const { initialState } = useModel('@@initialState');
   return (
     <PageContainer>
-      <Card
+      {/* <Card
         style={{
           borderRadius: 8,
         }}
@@ -158,7 +158,7 @@ const Welcome: React.FC = () => {
             />
           </div>
         </div>
-      </Card>
+      </Card> */}
     </PageContainer>
   );
 };

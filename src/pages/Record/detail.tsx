@@ -1,8 +1,10 @@
 import { ProCard, ProForm, ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
-import * as sampleTypeApi from '@/services/api/sampleType';
-import { useModel } from '@umijs/max';
+import * as recordApi from '@/services/api/record';
+import { useModel, Link } from '@umijs/max';
+
 import {
+  Breadcrumb,
   Button,
   Divider,
   Form,
@@ -10,7 +12,6 @@ import {
   message,
   Modal,
   Popconfirm,
-  Tag,
 } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
@@ -19,19 +20,14 @@ export default () => {
 
   const { initialState } = useModel('@@initialState');
   const userId = initialState?.currentUser?.userId
-  const param: { [key: string]: any; } | undefined = []
-  param.push(userId)
-  const [sampleType, setSampleType]: any = useState([])
-
+  // const param: { [key: string]: any; } | undefined = []
+  // param.push(userId)
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState('')
   const [modalTitle, setModalTitle] = useState('')
+
   const [form] = ProForm.useForm()
-
-
-  // search
-  const [searchSampleTypeNameInput, setSearchSampleTypeNameInput] = useState('')
   const [tableList, setTableList] = useState<any>([])
 
 
@@ -43,18 +39,17 @@ export default () => {
 
   const showModal = () => {
     setIsModalOpen(true);
-    setModalTitle('添加样本类型')
+    setModalTitle('新增实验记录')
     setModalStatus('add')
   };
 
 
-  const showEditModal = (sampleType: any) => {
+  const showEditModal = (record: any) => {
     setIsModalOpen(true)
-    setModalTitle('修改样本类型')
+    setModalTitle('修改实验记录')
     setModalStatus('update')
-    form.setFieldsValue({ id: sampleType.id })
-    form.setFieldsValue({ sampleTypeName: sampleType.sampleTypeName })
-
+    form.setFieldsValue({ id: record.id })
+    form.setFieldsValue({ recordName: record.recordName })
   }
 
   const onIdChange = (e: any) => {
@@ -62,80 +57,102 @@ export default () => {
     form.setFieldsValue({ id: value })
   }
 
-  const onSampleTypeNameChange = (e: any) => {
+  const onNameChange = (e: any) => {
     const { value } = e.target
-    form.setFieldsValue({ sampleTypeName: value })
+    form.setFieldsValue({ name: value })
   }
 
-  const listSampleType = async () => {
-    const result = await sampleTypeApi.list(param)
+  const getAllRecord = async () => {
+    const result = await recordApi.listRecordByUserId(userId)
+
     if (result.code === 200) {
       const data = result.data.result
 
-      setSampleType(data)
       setTableList(data)
     }
-    setSearchSampleTypeNameInput('')
   }
 
 
+  const get = async () => {
+    await getAllRecord()
+  }
   useEffect(() => {
-    listSampleType().then(data => {
-      // console.log(data)
-    })
+    get()
   }, [])
 
 
-  const del = async (sampleType: any) => {
-    const res = await sampleTypeApi.del(sampleType?.id)
+  const del = async (record: any) => {
+    const res = await recordApi.del(record?.id)
     if (res.code === 200) {
       message.success('删除成功')
     }
-    await listSampleType()
+    else{
+      message.warning(res.msg)
+    }
+    await getAllRecord()
 
   }
 
 
   const columns: any = [
     {
-      title: '样本类型',
-      key: 'sampleTypeName',
-      dataIndex: 'sampleTypeName',
+      title: '实验记录名称',
+      key: 'recordName',
+      dataIndex: 'recordName',
       search: false,
-      align: 'center',
-      render: (text: any) => {
+      align: "center",
+      render: (text: any, record: any) => {
         return (
-          <Tag color='cyan'>{text}</Tag>
+          <>
+            <Button type='dashed' color='blue'>
+              <Link to={`/myRecord/sample/${record.id}`}>{text}</Link>
+            </Button>
+          </>
         )
       }
+    },
+    {
+      title: '样本记录数量',
+      key: 'count',
+      dataIndex: 'count',
+      search: false,
+      align: "center"
+    },
+    {
+      title: '提交时间',
+      key: 'submitTime',
+      dataIndex: 'submitTime',
+      search: false,
+      align: "center"
     },
     {
       title: '创建时间',
       key: 'createTime',
       dataIndex: 'createTime',
       search: false,
-      align: 'center'
+      align: "center"
     },
+
     {
       title: '更新时间',
       key: 'updateTime',
       dataIndex: 'updateTime',
       search: false,
-      align: 'center'
+      align: "center"
     },
+
     {
       title: '操作',
       key: 'operation',
-      width: '300px',
       align: 'center',
       fixed: 'right',
       search: false,
-      render: (text: any, sampleType: any) => {
+      render: (text: any, reference: any) => {
         return (
           <>
             <Divider type="vertical" />
             <Button type="primary" onClick={() => {
-              showEditModal(sampleType)
+              showEditModal(reference)
             }}>
               编辑
             </Button>
@@ -147,12 +164,14 @@ export default () => {
               okText="是"
               cancelText="否"
               onConfirm={() => {
-                del(sampleType)
+                del(reference)
               }}
             >
               <Button type="primary" danger>删除</Button>
             </Popconfirm>
+
           </>
+
         )
       }
     },
@@ -167,8 +186,8 @@ export default () => {
           const param = {
             data: formDataObj
           }
-          await sampleTypeApi.update(param);
-          await listSampleType()
+          await recordApi.update(param);
+          await getAllRecord()
           setModalStatus('')
           setIsModalOpen(false)
 
@@ -183,50 +202,20 @@ export default () => {
           const param = {
             data: formDataObj
           }
-
-          const result = await sampleTypeApi.add(param);
-          await listSampleType()
-          if (result.code === 200) {
-            message.success(result.msg)
-          } else {
-            message.warning(result.msg)
-          }
+          await recordApi.add(param);
+          await getAllRecord()
           setModalStatus('')
           setIsModalOpen(false)
           form.resetFields()
         },
-        (err) => {
+        (err: any) => {
           console.log(err)
           return
         }
       )
     }
 
-  }
 
-
-  const filter = (
-    typeName: any,
-  ) => {
-    const newList = sampleType.filter((item: any) => {
-      let sampleTypeNameIndex
-
-      if (item.sampleTypeName === undefined) {
-        sampleTypeNameIndex = 0
-      } else if (typeName === '' || typeName === undefined || typeName === null) {
-        sampleTypeNameIndex = 1
-      } else {
-        sampleTypeNameIndex = item.sampleTypeName.indexOf(typeName)
-      }
-      return sampleTypeNameIndex >= 0
-    })
-    setTableList(newList)
-  }
-
-  const searchSampleTypeNameChange = (e: any) => {
-    const value = e.target.value
-    setSearchSampleTypeNameInput(value)
-    filter(value)
   }
 
 
@@ -236,28 +225,40 @@ export default () => {
       <ProCard boxShadow split="vertical">
 
         <ProCard ghost>
+
           <ProTable
             columns={columns}
             dataSource={tableList}
             rowKey="id"
             headerTitle={
               <>
-                <Input addonBefore='样本类型' value={searchSampleTypeNameInput}
-                  onChange={searchSampleTypeNameChange}></Input>
+                <Breadcrumb
+                  items={[
+                    {
+                      title: <Link to="/myRecord">实验记录管理</Link>,
+                    },
+                    {
+                      title: "实验记录详情",
+                    }
+
+                  ]}
+                />
               </>
             }
             toolbar={{
               actions: [
-                <Button key="list" type="primary" onClick={showModal}>
-                  新建
-                </Button>
+                <>
+                  <Button key="list" type="primary" onClick={showModal}>
+                    新增
+                  </Button>
+                </>
               ],
             }}
 
             search={false}
             pagination={{
               pageSize: 10,
-              onChange: (page) => console.log(page),
+              onChange: (page: any) => console.log(page),
             }}
 
           />
@@ -272,8 +273,8 @@ export default () => {
                 <Input onChange={onIdChange} />
               </Form.Item>
 
-              <Form.Item name="sampleTypeName" label="样本类型" rules={[{ required: true }]}>
-                <Input onChange={onSampleTypeNameChange} />
+              <Form.Item name="name" label="实验记录名称" rules={[{ required: true }]}>
+                <Input onChange={onNameChange} />
               </Form.Item>
 
             </Form>

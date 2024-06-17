@@ -25,20 +25,20 @@ export default [
     component: './Login',
   },
 
-  {
-    path: '/user',
-    name: '用户相关',
-    hideInMenu: true,
-    routes: [
-      {
-        name: '个人中心',
-        hideInMenu: true,
-        access: "user",
-        path: '/user/center',
-        component: './User/Center',
-      },
-    ],
-  },
+  // {
+  //   path: '/user',
+  //   name: '用户相关',
+  //   hideInMenu: true,
+  //   routes: [
+  //     {
+  //       name: '个人中心',
+  //       hideInMenu: true,
+  //       access: "user",
+  //       path: '/user/center',
+  //       component: './User/Center',
+  //     },
+  //   ],
+  // },
 
   {
     path: '/system',
@@ -68,8 +68,18 @@ export default [
   },
 
   {
-    path: '/management/record/:recordId',
+    path: '/management/record/:userId',
     access: 'AccountManagement',
+    name: 'management.record.detail',
+    hideInMenu: true,
+    component: './Management/Record/detail',
+  },
+
+  {
+    path: '/management/record/sample/:recordId',
+    access: 'AccountManagement',
+    name: 'management.soilSample',
+    hideInMenu: true,
     component: './Management/SoilSample',
   },
 
@@ -80,10 +90,19 @@ export default [
     access: 'MyProject',
     component: './Record',
   },
+  {
+    path: '/myRecord/:userId',
+    access: 'MyProject',
+    hideInMenu: true,
+    name: 'management.record.detail',
+    component: './Record/detail',
+  },
 
   {
-    path: '/myRecord/:recordId',
+    path: '/myRecord/sample/:recordId',
     access: 'MyProject',
+    hideInMenu: true,
+    name: 'management.soilSample',
     component: './SoilSample',
   },
   {

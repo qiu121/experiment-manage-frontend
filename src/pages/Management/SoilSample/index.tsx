@@ -16,7 +16,7 @@ import {
   Select,
   Breadcrumb,
   Tag,
-  InputNumber
+  InputNumber,
 } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
@@ -25,9 +25,9 @@ export default () => {
 
 
   const { initialState } = useModel('@@initialState');
-  const userId = initialState?.currentUser?.userId
-  const param: { [key: string]: any; } | undefined = []
-  param.push(userId)
+  // const userId = initialState?.currentUser?.userId
+  // const param: { [key: string]: any; } | undefined = []
+  // param.push(userId)
   const [sampleType, setSampleType]: any = useState([])
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,11 +36,17 @@ export default () => {
 
   const [form] = ProForm.useForm()
   const [tableList, setTableList] = useState<any>([])
+  const [dataTotal, setDataTotal] = useState<any>()
   const recordIdParam = useParams()
+  const { recordId } = recordIdParam
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const page = { currentPage, pageSize }
 
+  const [pagination, setPagination] = useState<any>({ current: 1, pageSize: 10, total: 0 });
+
+  let userId = localStorage.getItem('userId')
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -52,7 +58,7 @@ export default () => {
     setIsModalOpen(true);
     setModalTitle('新增样本记录')
     setModalStatus('add')
-    form.setFieldsValue({ recordId: recordIdParam.recordId })
+    form.setFieldsValue({ recordId: recordId })
   };
 
 
@@ -75,7 +81,7 @@ export default () => {
     form.setFieldsValue({ sampleTypeId: soilSample.sampleTypeId })
     // form.setFieldsValue({ sampleTypeName: soilSample.sampleTypeName })
 
-    form.setFieldsValue({ recordId: recordIdParam.recordId })
+    form.setFieldsValue({ recordId: recordId })
   }
 
   const onIdChange = (e: any) => {
@@ -131,17 +137,17 @@ export default () => {
 
 
   const getAllSoilSample = async () => {
-    const page = { currentPage, pageSize }
-    console.log(page);
 
-    const result = await soilSampleApi.list(page, recordIdParam.recordId)
-    // console.log(recordIdParam);
-    // console.log(typeof recordIdParam);
-    // console.log(typeof recordIdParam.recordId);
+    const result = await soilSampleApi.list(page, recordId)
+
+    // console.log(result);
+    // console.log(result.data.total);
 
     if (result.code === 200) {
       const data = result.data.result
+      const total = result.data.total
       setTableList(data)
+      setDataTotal(total)
     }
   }
 
@@ -297,7 +303,7 @@ export default () => {
     {
       title: '操作',
       key: 'operation',
-      width: '300px',
+      // width: '300px',
       align: 'center',
       fixed: 'right',
       search: false,
@@ -380,17 +386,6 @@ export default () => {
 
   return (
     <>
-      <Breadcrumb
-        items={[
-          {
-            // title: "实验记录管理",
-            title: <Link to="/management/record">实验记录管理</Link>,
-          },
-          {
-            title: "样本记录详情",
-          }
-        ]}
-      />
 
       <ProCard boxShadow split="vertical">
 
@@ -401,6 +396,19 @@ export default () => {
             rowKey="id"
             headerTitle={
               <>
+                <Breadcrumb
+                  items={[
+                    {
+                      title: <Link to="/management/record">实验记录管理</Link>,
+                    },
+                    {
+                      title: <Link to={`/management/record/${userId}`}>实验记录详情</Link>,
+                    },
+                    {
+                      title: "样本记录详情",
+                    }
+                  ]}
+                />
               </>
             }
             toolbar={{
@@ -412,18 +420,47 @@ export default () => {
             }}
 
             search={false}
-            pagination={
-              {
-                pageSize: pageSize,
-                current: currentPage,
-                hideOnSinglePage: false,
-                onChange: (page) => {
-                  console.log(page)
-                  console.log(pageSize);
-                  console.log(currentPage);
-                }
-              }
-            }
+            pagination={pagination}
+          // pagination={
+          //   {
+          //     total: dataTotal,
+          //     defaultCurrent: 1,
+          //     defaultPageSize: 10,
+          //     pageSize: pageSize,
+          //     current: currentPage,
+          //     showQuickJumper: true,
+          //     showSizeChanger: true,
+          //     hideOnSinglePage: false,
+          //     pageSizeOptions	:[5,10,20,30,50],
+
+          //     onChange: (currentPage, pageSize) => {
+          //       console.log('onChange');
+
+          //       console.log(currentPage)
+          //       console.log(pageSize);
+          //       setCurrentPage(currentPage)
+          //       // setPageSize(pageSize)
+          //       console.log(page);
+
+
+          //       getAllSoilSample()
+
+          //     },
+          //     onShowSizeChange: (currentPage, pageSize) => {
+          //       console.log('onShowSizeChange');
+
+          //       console.log(page);
+
+          //       console.log(currentPage);
+          //       console.log(pageSize);
+          //       // setCurrentPage(currentPage)
+          //       setPageSize(pageSize)
+
+          //       getAllSoilSample()
+          //     }
+          //     ,
+          //   }
+          // }
 
           />
           {/* edit & add */}
@@ -475,7 +512,7 @@ export default () => {
                   // defaultValue="1.00"
                   // style={{ width: 100 }}
                   min="0"
-                  max="10.00"
+                  max="50.00"
                   step="0.01"
                   onChange={onSizeGt2mmChange}
                   stringMode

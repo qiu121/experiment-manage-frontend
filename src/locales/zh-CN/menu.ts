@@ -12,6 +12,8 @@ export default {
 
   'menu.management.conference': '会议管理',
   'menu.management.record': '实验记录管理',
+  'menu.management.record.detail': '实验记录详情',
+  'menu.management.soilSample': '样本记录详情',
 
 
 

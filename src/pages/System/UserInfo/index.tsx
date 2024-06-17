@@ -1,4 +1,4 @@
-import { Card, Row, Col, Tag, message, Modal, Input, Select, Space, Button, Table, Popconfirm, Spin, Form} from 'antd';
+import { Card, Row, Col, Tag, message, Modal, Input, Select, Space, Button, Table, Popconfirm, Spin, Form } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, React, useState, useRef } from 'react';
 import md5 from 'js-md5';
@@ -39,9 +39,9 @@ const ProjectType: React.FC = () => {
     const res = await getAllUserInfo(inquireFormRef.current);
     if (res.code === 200) {
       setUserInfoList(res.data.userInfoList)
-      setPagination((prevState: any) => { return ({ ...prevState, total: res.data.total })})
+      setPagination((prevState: any) => { return ({ ...prevState, total: res.data.total }) })
     } else {
-      messageApi.open({type: 'error', content: '账号列表获取失败！'});
+      messageApi.open({ type: 'error', content: '账号列表获取失败！' });
     }
     setSpinLoading(false);
   }
@@ -49,27 +49,27 @@ const ProjectType: React.FC = () => {
   // 设置查询值
   const inquireFormChange = (e: any) => {
     const name = e.target.name;
-    setInquireForm((prevState: any) => { return ({ ...prevState, [name]: e.target.value })})
+    setInquireForm((prevState: any) => { return ({ ...prevState, [name]: e.target.value }) })
     inquireFormRef.current[name] = e.target.value
   };
 
   const statusChange = (value: any) => {
-    setInquireForm((prevState: any) => { return ({ ...prevState, status: value })})
+    setInquireForm((prevState: any) => { return ({ ...prevState, status: value }) })
     inquireFormRef.current.status = value
   };
-  
+
   // 分页
-  const handleTableChange = (item:any) => {
-    setInquireForm((prevState: any) => { return { ...prevState, currentPage: item.current}});
+  const handleTableChange = (item: any) => {
+    setInquireForm((prevState: any) => { return { ...prevState, currentPage: item.current } });
     inquireFormRef.current.currentPage = item.current;
-    setPagination((prevState: any) => { return { ...prevState, current: item.current}});
+    setPagination((prevState: any) => { return { ...prevState, current: item.current } });
     getAllUserInfoToll();
   };
 
   // 重置
   const rest = async () => {
     let param = { userName: '', name: '', status: null, currentPage: 1, pageSize: 10 };
-    setInquireForm((prevState: any) => {return {...prevState, ...param}});
+    setInquireForm((prevState: any) => { return { ...prevState, ...param } });
     inquireFormRef.current = param;
     getAllUserInfoToll();
   };
@@ -86,23 +86,23 @@ const ProjectType: React.FC = () => {
   const registerUserToll = async (param: any) => {
     debugger
     if (param.passWord !== param.verifyPassWord) {
-      messageApi.open({type: 'warning', content: '两次密码不一致！'});
+      messageApi.open({ type: 'warning', content: '两次密码不一致！' });
       return false;
     }
     debugger
     param.passWord = md5(param.passWord);
     const res = await registerUser(param);
     if (res.code === 200) {
-      messageApi.open({type: 'success', content: '账号新增成功！'});
+      messageApi.open({ type: 'success', content: '账号新增成功！' });
       setIsAddModalOpen(false);
       userInfoForm.resetFields();
       getAllUserInfoToll();
     } else if (res.code === 100002) {
-      messageApi.open({type: 'warning', content: '密码长度小于8位！'});
+      messageApi.open({ type: 'warning', content: '密码长度小于8位！' });
     } else if (res.code === 100003) {
-      messageApi.open({type: 'warning', content: '账号已存在！'});
+      messageApi.open({ type: 'warning', content: '账号已存在！' });
     } else {
-      messageApi.open({type: 'error', content: '账号新增失败！'});
+      messageApi.open({ type: 'error', content: '账号新增失败！' });
     }
   };
 
@@ -113,10 +113,10 @@ const ProjectType: React.FC = () => {
     const res = await getUserInfoByUserId({ userId: userId })
     if (res.code === 200) {
       setUserId(userId);
-      userInfoForm.setFieldsValue({...res.data.userInfo});
+      userInfoForm.setFieldsValue({ ...res.data.userInfo });
       setIsModifyModalOpen(true);
     } else {
-      messageApi.open({type: 'error', content: '账号信息获取失败！'});
+      messageApi.open({ type: 'error', content: '账号信息获取失败！' });
     }
   };
 
@@ -124,7 +124,7 @@ const ProjectType: React.FC = () => {
     param.userId = userId;
     if ((param.passWord !== "" && param.passWord !== undefined) || (param.verifyPassWord !== "" && param.verifyPassWord !== undefined)) {
       if (param.passWord !== param.verifyPassWord) {
-        messageApi.open({type: 'warning', content: '两次密码不一致！'});
+        messageApi.open({ type: 'warning', content: '两次密码不一致！' });
         return false;
       }
       param.passWord = md5(param.passWord);
@@ -132,11 +132,11 @@ const ProjectType: React.FC = () => {
 
     const res = await modifyUserInfo(param);
     if (res.code === 200) {
-      messageApi.open({type: 'success', content: '更新成功！'});
+      messageApi.open({ type: 'success', content: '更新成功！' });
       setIsModifyModalOpen(false);
       getAllUserInfoToll()
     } else {
-      messageApi.open({type: 'error', content: '更新失败！'});
+      messageApi.open({ type: 'error', content: '更新失败！' });
     }
   };
 
@@ -144,43 +144,62 @@ const ProjectType: React.FC = () => {
   const delUserInfoByUserIdToll = async (userId: string) => {
     const res = await delUserInfoByUserId({ userId: userId });
     if (res.code === 200) {
-      messageApi.open({type: 'success', content: '删除成功！'});
+      messageApi.open({ type: 'success', content: '删除成功！' });
       getAllUserInfoToll();
     } else {
-      messageApi.open({type: 'error', content: '删除失败！'});
+      messageApi.open({ type: 'error', content: '删除失败！' });
     }
   }
 
   const columns: any = [
-    { 
+    {
       title: '账号',
       dataIndex: 'userName',
       key: 'userName',
-      render: (_, record:any) => (
+      align: "center",
+      render: (_, record: any) => (
         <>{record.userName}</>
       ),
     },
-    { title: '名称', dataIndex: 'name', key: 'name' },
+    {
+       title: '名称', 
+      dataIndex: 'name',
+       key: 'name' ,
+       align:"center",
+      },
     {
       title: '角色',
       dataIndex: 'role',
       key: 'role',
+      align: "center",
       render: (text: any) => <span>{text.roleName}</span>
     },
-    { 
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      align: "center",
       render: (text: any) => <Tag color={(text === 1 ? '#87d068' : '#f50')}>{(text === 1 ? '正常' : '封禁')}</Tag>
     },
-    { title: '电话', dataIndex: 'phone', key: 'phone' },
-    { title: '邮箱', dataIndex: 'email', key: 'email' },
-    { 
+    {
+      title: '电话',
+      dataIndex: 'phone',
+      key: 'phone',
+      align: "center",
+    },
+    {
+      title: '邮箱',
+      dataIndex: 'email',
+      key: 'email',
+      align: "center",
+    },
+    {
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
-      width: '130px',
-      render: (_: any, record:any) => (
+      // width: '130px',
+      align:"center",
+      render: (_: any, record: any) => (
         <Space size="middle">
           <a onClick={() => modifyUserInfoModal(record.userId)}>更新</a>
           <Popconfirm
@@ -202,16 +221,16 @@ const ProjectType: React.FC = () => {
     setIsModifyModalOpen(false);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getAllUserInfoToll();
-  },[]);
+  }, []);
 
   return (
     <>
       {contextHolder}
       <Spin spinning={spinLoading}>
         <Card bodyStyle={{ padding: '10px 15px 10px 15px', textAlign: 'right' }}>
-          <Row gutter={[16,16]} style={{ marginBottom: '10px' }}>
+          <Row gutter={[16, 16]} style={{ marginBottom: '10px' }}>
             <Col span={12} style={{ textAlign: 'left' }}>
               <Space>
                 <Button type="primary" icon={<PlusOutlined />} onClick={addProjectTypeModal}>新增</Button>
@@ -223,19 +242,19 @@ const ProjectType: React.FC = () => {
                   value={inquireForm.userName}
                   placeholder="账号"
                   name='userName'
-                  onChange={inquireFormChange} 
+                  onChange={inquireFormChange}
                 />
                 <Input
                   value={inquireForm.name}
                   name='name'
                   placeholder="名称"
-                  onChange={inquireFormChange} 
+                  onChange={inquireFormChange}
                 />
                 <Select
                   style={{ width: '100px', textAlign: 'left' }}
                   placeholder="状态"
                   value={inquireForm.status}
-                  onChange={statusChange} 
+                  onChange={statusChange}
                   options={[
                     { value: 1, label: '正常' },
                     { value: 0, label: '封禁' },
@@ -277,6 +296,10 @@ const ProjectType: React.FC = () => {
                 { value: 1, label: '维护人员' },
                 { value: 2, label: '用户' },
               ]}
+              // options={SpeechRecognitionResultList.map(item:any)=>({
+              //   value:item.id,
+              //   label:item.roleName,
+              // })}
             />
           </Form.Item>
           <Form.Item name="phone" label="手机号码" rules={[{ required: true }]}>
@@ -296,11 +319,11 @@ const ProjectType: React.FC = () => {
               <Button type="primary" htmlType="submit">
                 提交
               </Button>
-              <Button htmlType="button" onClick={() => {userInfoForm.resetFields()}}>
+              <Button htmlType="button" onClick={() => { userInfoForm.resetFields() }}>
                 重置
               </Button>
             </Space>
-            </Form.Item>
+          </Form.Item>
         </Form>
       </Modal>
 
@@ -352,11 +375,11 @@ const ProjectType: React.FC = () => {
               <Button type="primary" htmlType="submit">
                 提交
               </Button>
-              <Button htmlType="button" onClick={() => {userInfoForm.resetFields()}}>
+              <Button htmlType="button" onClick={() => { userInfoForm.resetFields() }}>
                 重置
               </Button>
             </Space>
-            </Form.Item>
+          </Form.Item>
         </Form>
       </Modal>
     </>

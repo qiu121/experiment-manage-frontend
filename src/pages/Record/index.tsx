@@ -1,73 +1,26 @@
-import {ProCard, ProForm, ProTable} from '@ant-design/pro-components';
-import React, {useEffect, useState} from 'react';
+import { ProCard, ProTable } from '@ant-design/pro-components';
+import React, { useEffect, useState } from 'react';
 import * as recordApi from '@/services/api/record';
-import {useModel, Link} from '@umijs/max';
+import { useModel, Link } from '@umijs/max';
 
 import {
   Button,
-  Divider,
-  Form,
-  Input,
-  message,
-  Modal,
-  Popconfirm,
   Tag,
 } from 'antd';
-import {QuestionCircleOutlined} from '@ant-design/icons';
 
 
 export default () => {
 
-  const {initialState} = useModel('@@initialState');
+  const { initialState } = useModel('@@initialState');
   const userId = initialState?.currentUser?.userId
-  const param: { [key: string]: any; } | undefined = []
-  param.push(userId)
+  // const param: { [key: string]: any; } | undefined = []
+  // param.push(userId)
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalStatus, setModalStatus] = useState('')
-  const [modalTitle, setModalTitle] = useState('')
-
-  const [form] = ProForm.useForm()
   const [tableList, setTableList] = useState<any>([])
 
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    form.resetFields()
-  };
-
-
-  const showModal = () => {
-    setIsModalOpen(true);
-    setModalTitle('新增实验记录')
-    setModalStatus('add')
-  };
-
-
-  const showEditModal = (record: any) => {
-    setIsModalOpen(true)
-    setModalTitle('修改实验记录')
-    setModalStatus('update')
-    form.setFieldsValue({id: record.id})
-    form.setFieldsValue({name: record.name})
-    form.setFieldsValue({username: record.username})
-    form.setFieldsValue({status: record.status})
-    form.setFieldsValue({createTime: record.createTime})
-    form.setFieldsValue({updateTime: record.updateTime})
-  }
-
-  const onIdChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({id: value})
-  }
-
-  const onNameChange = (e: any) => {
-    const {value} = e.target
-    form.setFieldsValue({name: value})
-  }
-
   const getAllRecord = async () => {
-    const result = await recordApi.listRecordByUserId(userId)
+    const result = await recordApi.getRecordByUserId(userId)
 
     if (result.code === 200) {
       const data = result.data.result
@@ -84,25 +37,7 @@ export default () => {
     get()
   }, [])
 
-
-  const del = async (record: any) => {
-    const res = await recordApi.del(record?.id)
-    if (res.code === 200) {
-      message.success('删除成功')
-    }
-    await getAllRecord()
-
-  }
-
-
   const columns: any = [
-    // {
-    //   title: '实验记录名称',
-    //   key: 'name',
-    //   dataIndex: 'name',
-    //   search: false,
-    //   align: "center"
-    // },
     {
       title: '提交人',
       key: 'username',
@@ -113,7 +48,7 @@ export default () => {
         return (
           <>
             <Button type='dashed' color='blue'>
-              <Link to={`/myRecord/${record.id}`}>{text}</Link>
+              <Link to={`/myRecord/${record.userId}`}>{text}</Link>
             </Button>
           </>
         )
@@ -126,25 +61,7 @@ export default () => {
       search: false,
       align: "center"
     },
-    {
-      title: '状态',
-      key: 'status',
-      dataIndex: 'status',
-      search: false,
-      align: "center",
-      render: (text: any) => {
-        return (
-          <>
-            {text === '待完成' ? (
-              <Tag color='processing'>{text}</Tag>
-            ) : (
-              <Tag color='success'>{text}</Tag>
-            )}
-          </>
-        )
-      }
 
-    },
     {
       title: '提交时间',
       key: 'submitTime',
@@ -168,84 +85,7 @@ export default () => {
       align: "center"
     },
 
-    {
-      title: '操作',
-      key: 'operation',
-      width: '300px',
-      align: 'center',
-      fixed: 'right',
-      search: false,
-      render: (text: any, reference: any) => {
-        return (
-          <>
-            <Divider type="vertical"/>
-            <Button type="primary" onClick={() => {
-              showEditModal(reference)
-            }}>
-              编辑
-            </Button>
-            <Divider type="vertical"/>
-            <Popconfirm
-              title='提示'
-              description="确认删除该项吗？"
-              icon={<QuestionCircleOutlined style={{color: 'red'}}/>}
-              okText="是"
-              cancelText="否"
-              onConfirm={() => {
-                del(reference)
-              }}
-            >
-              <Button type="primary" danger>删除</Button>
-            </Popconfirm>
-
-          </>
-
-        )
-      }
-    },
   ];
-
-
-  const handleOk = async () => {
-    if (modalStatus === 'update') {
-      form.validateFields().then(
-        async () => {
-          const formDataObj = form.getFieldsValue(true)
-          const param = {
-            data: formDataObj
-          }
-          await recordApi.update(param);
-          await getAllRecord()
-          setModalStatus('')
-          setIsModalOpen(false)
-
-          form.resetFields()
-        }
-      )
-    } else if (modalStatus === 'add') {
-      form.validateFields().then(
-        async () => {
-          const formDataObj = form.getFieldsValue(true)
-          setIsModalOpen(false)
-          const param = {
-            data: formDataObj
-          }
-          await recordApi.add(param);
-          await getAllRecord()
-          setModalStatus('')
-          setIsModalOpen(false)
-          form.resetFields()
-        },
-        (err: any) => {
-          console.log(err)
-          return
-        }
-      )
-    }
-
-
-  }
-
 
   return (
     <>
@@ -264,9 +104,7 @@ export default () => {
             toolbar={{
               actions: [
                 <>
-                  <Button key="list" type="primary" onClick={showModal}>
-                    新建
-                  </Button>
+
                 </>
               ],
             }}
@@ -278,29 +116,6 @@ export default () => {
             }}
 
           />
-          {/* edit & add */}
-          <Modal title={modalTitle} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <Form
-              labelCol={{span: 6}}
-              wrapperCol={{span: 16}}
-              form={form}
-            >
-              <Form.Item hidden name="id" label="id">
-                <Input onChange={onIdChange}/>
-              </Form.Item>
-
-              <Form.Item name="name" label="实验记录名称" rules={[{required: true}]}>
-                <Input onChange={onNameChange}/>
-              </Form.Item>
-
-              {/* <Form.Item name="useraame" label="提交人" rules={[{required: true}]}>
-                <Input onChange={onHostChange}/>
-              </Form.Item> */}
-
-            </Form>
-
-          </Modal>
-
 
         </ProCard>
       </ProCard>
