@@ -1,10 +1,10 @@
 import {request} from '@umijs/max';
 
 
-export async function list(options?: { [key: string]: any }) {
+export async function list(page: { [key: string]: any }) {
   return request('/backend/api/sampleType/list', {
-    method: 'GET',
-    ...(options || {}),
+    method: 'POST',
+    data:page
   });
 }
 

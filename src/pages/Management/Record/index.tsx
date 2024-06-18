@@ -6,7 +6,6 @@ import { Link } from 'umi';
 import {
   Button,
   Input,
-  Tag,
 } from 'antd';
 
 
@@ -23,12 +22,17 @@ export default () => {
   const [searchUserameInput, setSearchUserameInput] = useState('')
   const [tableList, setTableList] = useState<any>([])
 
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [dataTotal, setDataTotal] = useState<number>()
 
-  const getAllRecord = async () => {
-    const result = await recordApi.listRecord()
+  const getAllRecord = async (currentPage:number,pageSize:number) => {
+    const result = await recordApi.listRecord({ currentPage, pageSize})
     if (result.code === 200) {
       const data = result.data.result
+      const total =result.data.total
 
+      setDataTotal(total)
       setRecord(data)
       setTableList(data)
     }
@@ -37,7 +41,7 @@ export default () => {
 
 
   const get = async () => {
-    await getAllRecord()
+    await getAllRecord(currentPage,pageSize)
   }
   useEffect(() => {
     get()
@@ -145,10 +149,25 @@ export default () => {
             }}
 
             search={false}
-            pagination={{
-              pageSize: 10,
-              onChange: (page) => console.log(page),
-            }}
+            pagination={
+            {
+              total: dataTotal,
+              pageSize: pageSize,
+              current: currentPage,
+              showQuickJumper: true,
+              showSizeChanger: true,
+              hideOnSinglePage: false,
+
+              onChange: (page, size) => {
+
+                setCurrentPage(page)
+                setPageSize(size)
+                getAllRecord(page, size)
+
+              },
+
+            }
+          }
 
           />
 

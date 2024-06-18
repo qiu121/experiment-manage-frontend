@@ -37,11 +37,11 @@ export default () => {
 
   const [form] = ProForm.useForm()
   const [tableList, setTableList] = useState<any>([])
+  const [dataTotal, setDataTotal] = useState<number>()
 
-  const {recordId} = useParams()
+  const { recordId } = useParams()
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
-  const page = { currentPage, pageSize }
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -136,12 +136,14 @@ export default () => {
     form.setFieldsValue({ waterRetention: value })
   }
 
-  const getAllSoilSample = async () => {
-    const result = await soilSampleApi.list(page,recordId)
+  const getAllSoilSample = async (currentPage: number, pageSize: number) => {
+    const result = await soilSampleApi.list({ currentPage, pageSize }, recordId)
 
     if (result.code === 200) {
       const data = result.data.result
+      const total = result.data.total
       setTableList(data)
+      setDataTotal(total)
     }
   }
 
@@ -156,7 +158,7 @@ export default () => {
 
 
   const init = async () => {
-    await getAllSoilSample()
+    await getAllSoilSample(currentPage, pageSize)
     await listSampleType()
   }
   useEffect(() => {
@@ -171,7 +173,7 @@ export default () => {
     if (res.code === 200) {
       message.success('删除成功')
     }
-    await getAllSoilSample()
+    await getAllSoilSample(currentPage, pageSize)
 
   }
 
@@ -342,7 +344,7 @@ export default () => {
           // console.log(param);
 
           await soilSampleApi.update(param);
-          await getAllSoilSample()
+          await getAllSoilSample(currentPage, pageSize)
           setModalStatus('')
           setIsModalOpen(false)
 
@@ -360,7 +362,7 @@ export default () => {
           // console.log(param);
 
           await soilSampleApi.add(param);
-          await getAllSoilSample()
+          await getAllSoilSample(currentPage, pageSize)
           setModalStatus('')
           setIsModalOpen(false)
           form.resetFields()
@@ -412,10 +414,25 @@ export default () => {
             }}
 
             search={false}
-            pagination={{
-              pageSize: 10,
-              onChange: (page) => console.log(page),
-            }}
+            pagination={
+              {
+                total: dataTotal,
+                pageSize: pageSize,
+                current: currentPage,
+                showQuickJumper: true,
+                showSizeChanger: true,
+                hideOnSinglePage: false,
+
+                onChange: (page, size) => {
+
+                  setCurrentPage(page)
+                  setPageSize(size)
+                  getAllSoilSample(page, size)
+
+                },
+
+              }
+            }
 
           />
           {/* edit & add */}

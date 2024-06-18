@@ -32,6 +32,10 @@ export default () => {
   const [form] = ProForm.useForm()
   const [tableList, setTableList] = useState<any>([])
 
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [dataTotal, setDataTotal] = useState<number>()
+
   // const userIdParam = useParams()
   const { userId } = useParams()
 
@@ -67,22 +71,25 @@ export default () => {
     form.setFieldsValue({ recordName: value })
   }
 
-  const getAllRecord = async () => {
+  const getAllRecord = async (currentPage:number,pageSize:number) => {
 
-    const result = await recordApi.listRecordByUserId(userId)
+    const result = await recordApi.listRecordByUserId({currentPage,pageSize},userId)
 
     if (result.code === 200) {
       const data = result.data.result
+      const total =result.data.total
+
       let { userId } = data[0]
       localStorage.setItem('userId',userId)
 
+      setDataTotal(total)
       setTableList(data)
     }
   }
 
 
   const get = async () => {
-    await getAllRecord()
+    await getAllRecord(currentPage,pageSize)
   }
   useEffect(() => {
     get()
@@ -96,7 +103,7 @@ export default () => {
     }else{
       message.warning(res.msg)
     }
-    await getAllRecord()
+    await getAllRecord(currentPage,pageSize)
 
   }
 
@@ -215,7 +222,7 @@ export default () => {
             data: formDataObj
           }
           await recordApi.update(param);
-          await getAllRecord()
+          await getAllRecord(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
 
@@ -231,7 +238,7 @@ export default () => {
           const recordParam = { userId, recordName }
 
           await recordApi.add(recordParam);
-          await getAllRecord()
+          await getAllRecord(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
           form.resetFields()
@@ -283,10 +290,25 @@ export default () => {
             }}
 
             search={false}
-            pagination={{
-              pageSize: 10,
-              onChange: (page: any) => console.log(page),
-            }}
+            pagination={
+            {
+              total: dataTotal,
+              pageSize: pageSize,
+              current: currentPage,
+              showQuickJumper: true,
+              showSizeChanger: true,
+              hideOnSinglePage: false,
+
+              onChange: (page, size) => {
+
+                setCurrentPage(page)
+                setPageSize(size)
+                getAllRecord(page, size)
+
+              },
+
+            }
+          }
 
           />
           {/* edit & add */}

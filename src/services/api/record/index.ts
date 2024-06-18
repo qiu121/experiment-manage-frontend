@@ -1,18 +1,17 @@
 import { request } from '@umijs/max';
-import { method } from 'lodash';
 
 
-export async function listRecord(options?: { [key: string]: any }) {
+export async function listRecord(page: { [key: string]: any }) {
   return request('/backend/api/record/listRecord', {
-    method: 'GET',
-    ...(options || {}),
+    method: 'POST',
+    data: page,
   });
 }
 
-export async function listRecordByUserId(userId: any) {
+export async function listRecordByUserId(page: { [key: string]: any }, userId: any) {
   return request(`/backend/api/record/listRecordByUserId/${userId}`, {
-    method: 'GET',
-    ...(userId || {}),
+    method: 'POST',
+    data: page
   });
 }
 
@@ -27,7 +26,7 @@ export async function get(options?: { [key: string]: any }) {
 export async function add(options?: { [key: string]: any }) {
   return request('/backend/api/record/add', {
     method: 'POST',
-    data:options,
+    data: options,
     ...(options || {}),
   });
 }
@@ -48,8 +47,9 @@ export async function del(id?: any) {
 }
 
 
-export async function getRecordByUserId(userId: string | undefined) {
+export async function getRecordByUserId(page: { [key: string]: any }, userId: string | undefined) {
   return request(`/backend/api/record/getRecord/${userId}`, {
-    method: 'GET',
+    method: 'POST',
+    data: page
   });
 }

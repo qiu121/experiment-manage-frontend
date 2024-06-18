@@ -1,7 +1,7 @@
 import { request } from '@umijs/max';
 
 
-export async function list(page: any, recordId: any) {
+export async function list(page: { [key: string]: any }, recordId: any) {
   return request(`/backend/api/soilSample/list/${recordId}`, {
     method: 'POST',
     data: page,

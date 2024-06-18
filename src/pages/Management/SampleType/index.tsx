@@ -18,9 +18,9 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 export default () => {
 
   const { initialState } = useModel('@@initialState');
-  const userId = initialState?.currentUser?.userId
-  const param: { [key: string]: any; } | undefined = []
-  param.push(userId)
+  // const userId = initialState?.currentUser?.userId
+  // const param: { [key: string]: any; } | undefined = []
+  // param.push(userId)
   const [sampleType, setSampleType]: any = useState([])
 
 
@@ -29,6 +29,10 @@ export default () => {
   const [modalTitle, setModalTitle] = useState('')
   const [form] = ProForm.useForm()
 
+
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [dataTotal, setDataTotal] = useState<number>()
 
   // search
   const [searchSampleTypeNameInput, setSearchSampleTypeNameInput] = useState('')
@@ -67,22 +71,24 @@ export default () => {
     form.setFieldsValue({ sampleTypeName: value })
   }
 
-  const listSampleType = async () => {
-    const result = await sampleTypeApi.list(param)
+  const listSampleType = async (currentPage: number, pageSize: number) => {
+    const result = await sampleTypeApi.list({ currentPage, pageSize })
     if (result.code === 200) {
       const data = result.data.result
+      const total = result.data.total
 
       setSampleType(data)
       setTableList(data)
+      setDataTotal(total)
     }
     setSearchSampleTypeNameInput('')
   }
-
+  const list = async () => {
+    await listSampleType(currentPage, pageSize)
+  }
 
   useEffect(() => {
-    listSampleType().then(data => {
-      // console.log(data)
-    })
+    list()
   }, [])
 
 
@@ -91,7 +97,7 @@ export default () => {
     if (res.code === 200) {
       message.success('删除成功')
     }
-    await listSampleType()
+    await listSampleType(currentPage, pageSize)
 
   }
 
@@ -168,7 +174,7 @@ export default () => {
             data: formDataObj
           }
           await sampleTypeApi.update(param);
-          await listSampleType()
+          await listSampleType(currentPage, pageSize)
           setModalStatus('')
           setIsModalOpen(false)
 
@@ -185,7 +191,7 @@ export default () => {
           }
 
           const result = await sampleTypeApi.add(param);
-          await listSampleType()
+          await listSampleType(currentPage, pageSize)
           if (result.code === 200) {
             message.success(result.msg)
           } else {
@@ -255,10 +261,26 @@ export default () => {
             }}
 
             search={false}
-            pagination={{
-              pageSize: 10,
-              onChange: (page) => console.log(page),
-            }}
+
+            pagination={
+              {
+                total: dataTotal,
+                pageSize: pageSize,
+                current: currentPage,
+                showQuickJumper: true,
+                showSizeChanger: true,
+                hideOnSinglePage: false,
+
+                onChange: (page, size) => {
+
+                  setCurrentPage(page)
+                  setPageSize(size)
+                  listSampleType(page, size)
+
+                },
+
+              }
+            }
 
           />
           {/* edit & add */}

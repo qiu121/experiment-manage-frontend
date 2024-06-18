@@ -42,9 +42,7 @@ export default () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
-  const page = { currentPage, pageSize }
 
-  const [pagination, setPagination] = useState<any>({ current: 1, pageSize: 10, total: 0 });
 
   let userId = localStorage.getItem('userId')
 
@@ -136,12 +134,9 @@ export default () => {
   }
 
 
-  const getAllSoilSample = async () => {
+  const getAllSoilSample = async (page:number,size:number) => {
 
-    const result = await soilSampleApi.list(page, recordId)
-
-    // console.log(result);
-    // console.log(result.data.total);
+    const result = await soilSampleApi.list({ currentPage:page, pageSize :size}, recordId)
 
     if (result.code === 200) {
       const data = result.data.result
@@ -162,13 +157,16 @@ export default () => {
 
 
   const init = async () => {
-    await getAllSoilSample()
+    await getAllSoilSample(currentPage,pageSize)
     await listSampleType()
   }
   useEffect(() => {
     init()
 
   }, [])
+
+  useEffect(() => {
+  }, [currentPage, pageSize]);
 
 
   const del = async (soilSample: any) => {
@@ -177,7 +175,7 @@ export default () => {
     if (res.code === 200) {
       message.success('删除成功')
     }
-    await getAllSoilSample()
+    await getAllSoilSample(currentPage,pageSize)
 
   }
 
@@ -350,7 +348,7 @@ export default () => {
           // console.log(param);
 
           await soilSampleApi.update(param);
-          await getAllSoilSample()
+          await getAllSoilSample(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
 
@@ -368,7 +366,7 @@ export default () => {
           // console.log(param);
 
           await soilSampleApi.add(param);
-          await getAllSoilSample()
+          await getAllSoilSample(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
           form.resetFields()
@@ -420,47 +418,25 @@ export default () => {
             }}
 
             search={false}
-            pagination={pagination}
-          // pagination={
-          //   {
-          //     total: dataTotal,
-          //     defaultCurrent: 1,
-          //     defaultPageSize: 10,
-          //     pageSize: pageSize,
-          //     current: currentPage,
-          //     showQuickJumper: true,
-          //     showSizeChanger: true,
-          //     hideOnSinglePage: false,
-          //     pageSizeOptions	:[5,10,20,30,50],
+            pagination={
+              {
+                total: dataTotal,
+                pageSize: pageSize,
+                current: currentPage,
+                showQuickJumper: true,
+                showSizeChanger: true,
+                hideOnSinglePage: false,
 
-          //     onChange: (currentPage, pageSize) => {
-          //       console.log('onChange');
+                onChange: (page, size) => {
 
-          //       console.log(currentPage)
-          //       console.log(pageSize);
-          //       setCurrentPage(currentPage)
-          //       // setPageSize(pageSize)
-          //       console.log(page);
+                  setCurrentPage(page)
+                  setPageSize(size)
+                  getAllSoilSample(page,size)
 
-
-          //       getAllSoilSample()
-
-          //     },
-          //     onShowSizeChange: (currentPage, pageSize) => {
-          //       console.log('onShowSizeChange');
-
-          //       console.log(page);
-
-          //       console.log(currentPage);
-          //       console.log(pageSize);
-          //       // setCurrentPage(currentPage)
-          //       setPageSize(pageSize)
-
-          //       getAllSoilSample()
-          //     }
-          //     ,
-          //   }
-          // }
+                },
+            
+              }
+            }
 
           />
           {/* edit & add */}

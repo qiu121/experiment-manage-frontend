@@ -30,6 +30,10 @@ export default () => {
   const [form] = ProForm.useForm()
   const [tableList, setTableList] = useState<any>([])
 
+   // 分页
+   const [currentPage, setCurrentPage] = useState<number>(1)
+   const [pageSize, setPageSize] = useState<number>(10)
+   const [dataTotal, setDataTotal] = useState<number>()
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -62,8 +66,8 @@ export default () => {
     form.setFieldsValue({ name: value })
   }
 
-  const getAllRecord = async () => {
-    const result = await recordApi.listRecordByUserId(userId)
+  const getAllRecord = async (currentPage:number,pageSize:number) => {
+    const result = await recordApi.listRecordByUserId({currentPage,pageSize},userId)
 
     if (result.code === 200) {
       const data = result.data.result
@@ -74,7 +78,7 @@ export default () => {
 
 
   const get = async () => {
-    await getAllRecord()
+    await getAllRecord(currentPage,pageSize)
   }
   useEffect(() => {
     get()
@@ -89,7 +93,7 @@ export default () => {
     else{
       message.warning(res.msg)
     }
-    await getAllRecord()
+    await getAllRecord(currentPage,pageSize)
 
   }
 
@@ -187,7 +191,7 @@ export default () => {
             data: formDataObj
           }
           await recordApi.update(param);
-          await getAllRecord()
+          await getAllRecord(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
 
@@ -203,7 +207,7 @@ export default () => {
             data: formDataObj
           }
           await recordApi.add(param);
-          await getAllRecord()
+          await getAllRecord(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
           form.resetFields()
@@ -256,10 +260,25 @@ export default () => {
             }}
 
             search={false}
-            pagination={{
-              pageSize: 10,
-              onChange: (page: any) => console.log(page),
-            }}
+            pagination={
+              {
+                total: dataTotal,
+                pageSize: pageSize,
+                current: currentPage,
+                showQuickJumper: true,
+                showSizeChanger: true,
+                hideOnSinglePage: false,
+
+                onChange: (page, size) => {
+
+                  setCurrentPage(page)
+                  setPageSize(size)
+                  getAllRecord(page, size)
+
+                },
+
+              }
+            }
 
           />
           {/* edit & add */}
