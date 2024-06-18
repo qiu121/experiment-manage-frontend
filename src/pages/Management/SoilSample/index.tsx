@@ -434,7 +434,6 @@ export default () => {
                   getAllSoilSample(page,size)
 
                 },
-            
               }
             }
 
@@ -500,7 +499,7 @@ export default () => {
                   // defaultValue="1.00"
                   // style={{ width: 100 }}
                   min="0"
-                  max="10.00"
+                  max="50.00"
                   step="0.01"
                   onChange={onSizeLt2mmChange}
                   stringMode

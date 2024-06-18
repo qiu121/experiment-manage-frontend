@@ -1,7 +1,7 @@
 import {request} from '@umijs/max';
 
 
-export async function list(page: { [key: string]: any }) {
+export async function list(page: { [key: string]: any } = {}) {
   return request('/backend/api/sampleType/list', {
     method: 'POST',
     data:page

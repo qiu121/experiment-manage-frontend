@@ -34,6 +34,7 @@ export async function add(options?: { [key: string]: any }) {
 export async function update(options?: { [key: string]: any }) {
   return request('/backend/api/record/update', {
     method: 'PUT',
+    data: options,
     ...(options || {}),
   });
 }

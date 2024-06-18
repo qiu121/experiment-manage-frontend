@@ -5,7 +5,6 @@ import { useModel, Link } from '@umijs/max';
 
 import {
   Button,
-  Tag,
 } from 'antd';
 
 
@@ -61,7 +60,7 @@ export default () => {
       }
     },
     {
-      title: '样本记录数量',
+      title: '实验记录数量',
       key: 'count',
       dataIndex: 'count',
       search: false,

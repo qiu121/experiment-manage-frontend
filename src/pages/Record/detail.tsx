@@ -12,6 +12,7 @@ import {
   message,
   Modal,
   Popconfirm,
+  Tag,
 } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
@@ -30,10 +31,10 @@ export default () => {
   const [form] = ProForm.useForm()
   const [tableList, setTableList] = useState<any>([])
 
-   // 分页
-   const [currentPage, setCurrentPage] = useState<number>(1)
-   const [pageSize, setPageSize] = useState<number>(10)
-   const [dataTotal, setDataTotal] = useState<number>()
+  // 分页
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [dataTotal, setDataTotal] = useState<number>()
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -61,9 +62,9 @@ export default () => {
     form.setFieldsValue({ id: value })
   }
 
-  const onNameChange = (e: any) => {
+  const onRecordNameChange = (e: any) => {
     const { value } = e.target
-    form.setFieldsValue({ name: value })
+    form.setFieldsValue({ recordName: value })
   }
 
   const getAllRecord = async (currentPage:number,pageSize:number) => {
@@ -71,8 +72,9 @@ export default () => {
 
     if (result.code === 200) {
       const data = result.data.result
-
+      const total = result.total
       setTableList(data)
+      setDataTotal(total)
     }
   }
 
@@ -121,6 +123,25 @@ export default () => {
       dataIndex: 'count',
       search: false,
       align: "center"
+    },
+    {
+      title: '状态',
+      key: 'status',
+      dataIndex: 'status',
+      search: false,
+      align: "center",
+      render: (text: any) => {
+        return (
+          <>
+            {text === '已完成' ? (
+              <Tag color='success'>{text}</Tag>
+            ) : (
+              <Tag color='processing'>{text}</Tag>
+            )}
+          </>
+        )
+      }
+
     },
     {
       title: '提交时间',
@@ -187,10 +208,8 @@ export default () => {
       form.validateFields().then(
         async () => {
           const formDataObj = form.getFieldsValue(true)
-          const param = {
-            data: formDataObj
-          }
-          await recordApi.update(param);
+
+          await recordApi.update(formDataObj);
           await getAllRecord(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
@@ -201,12 +220,11 @@ export default () => {
     } else if (modalStatus === 'add') {
       form.validateFields().then(
         async () => {
-          const formDataObj = form.getFieldsValue(true)
+          const { recordName } = form.getFieldsValue(true)
           setIsModalOpen(false)
-          const param = {
-            data: formDataObj
-          }
-          await recordApi.add(param);
+
+          const recordParam ={userId,recordName}
+          await recordApi.add(recordParam);
           await getAllRecord(currentPage,pageSize)
           setModalStatus('')
           setIsModalOpen(false)
@@ -292,8 +310,8 @@ export default () => {
                 <Input onChange={onIdChange} />
               </Form.Item>
 
-              <Form.Item name="name" label="实验记录名称" rules={[{ required: true }]}>
-                <Input onChange={onNameChange} />
+              <Form.Item name="recordName" label="实验记录名称" rules={[{ required: true }]}>
+                <Input onChange={onRecordNameChange} />
               </Form.Item>
 
             </Form>
