@@ -15,6 +15,9 @@ export default {
   'menu.management.record.detail': '实验记录详情',
   'menu.management.soilSample': '样本记录详情',
 
+  'menu.user.about': '用户相关',
+  'menu.user.about.center': '用户中心',
+
 
 
 

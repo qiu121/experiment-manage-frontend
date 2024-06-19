@@ -1,20 +1,20 @@
-import { Card, Tag, Row, Col, Form, message, Space, Input, Button, Spin, Select, Popconfirm, Tabs} from 'antd';
-import { useEffect, React, useState, useRef } from 'react';
+import { Card, Form, message, Space, Input, Button } from 'antd';
+import React, { useEffect } from 'react';
 import { useParams } from 'umi';
 import md5 from 'js-md5';
 
 import {
-  getAllUserInfo,
   getUserInfoByUserId,
-  registerUser,
   modifyUserInfo,
-  delUserInfoByUserId
 } from '@/services/api/user/userApi';
+import { useModel } from '@umijs/max';
 
 
 const UserHome: React.FC = () => {
 
   const params = useParams();
+  const { initialState } = useModel('@@initialState');
+  const userId = initialState?.currentUser?.userId
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -22,19 +22,19 @@ const UserHome: React.FC = () => {
     labelCol: { span: 5 },
     wrapperCol: { span: 12 },
   };
-  
+
   const tailLayout = {
     wrapperCol: { offset: 15, span: 8 },
   };
 
-  const getUserInfoByUserIdToll = async() => {
-    const res = await getUserInfoByUserId({ userId: "" })
+  const getUserInfoByUserIdToll = async () => {
+    const res = await getUserInfoByUserId(userId)
     if (res.code === 200) {
       const userInfo = res.data.userInfo;
       userInfo.oldPassWord = "";
       userInfoForm.setFieldsValue(userInfo);
     } else {
-      messageApi.open({type: 'error', content: '账号信息获取失败！'});
+      messageApi.open({ type: 'error', content: '账号信息获取失败！' });
     }
   }
 
@@ -42,12 +42,12 @@ const UserHome: React.FC = () => {
   const modifyUserInfoToll = async (param: any) => {
     if ((param.passWord !== "" && param.passWord !== undefined) || (param.verifyPassWord !== "" && param.verifyPassWord !== undefined)) {
       if (param.oldPassWord === "" || param.oldPassWord === undefined) {
-        messageApi.open({type: 'warning', content: '旧密码不能为空！'});
+        messageApi.open({ type: 'warning', content: '旧密码不能为空！' });
         return false;
       }
 
       if (param.passWord !== param.verifyPassWord) {
-        messageApi.open({type: 'warning', content: '两次密码不一致！'});
+        messageApi.open({ type: 'warning', content: '两次密码不一致！' });
         return false;
       }
 
@@ -57,15 +57,15 @@ const UserHome: React.FC = () => {
 
     const res = await modifyUserInfo(param);
     if (res.code === 200) {
-      messageApi.open({type: 'success', content: '更新成功！'});
+      messageApi.open({ type: 'success', content: '更新成功！' });
     } else {
-      messageApi.open({type: 'error', content: res.msg});
+      messageApi.open({ type: 'error', content: res.msg });
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getUserInfoByUserIdToll()
-  },[]);
+  }, []);
 
   return (
     <>
@@ -99,11 +99,11 @@ const UserHome: React.FC = () => {
               <Button type="primary" htmlType="submit">
                 提交
               </Button>
-              <Button htmlType="button" onClick={() => {userInfoForm.resetFields()}}>
+              <Button htmlType="button" onClick={() => { userInfoForm.resetFields() }}>
                 重置
               </Button>
             </Space>
-            </Form.Item>
+          </Form.Item>
         </Form>
       </Card>
     </>

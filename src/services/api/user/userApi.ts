@@ -11,9 +11,10 @@ export async function getAllUserInfo(options?: { [key: string]: any }) {
 }
 
 /** 根据id获取用户信息 GET /api/user/getUserInfoByUserId */
-export async function getUserInfoByUserId(options: { userId: string }) {
-  return request('/backend/api/user/getUserInfoByUserId?userId=' + options.userId , {
+export async function getUserInfoByUserId(userId: string | undefined) {
+  return request('/backend/api/user/getUserInfoByUserId', {
     method: 'GET',
+    params:{userId}
   });
 }
 
@@ -43,7 +44,7 @@ export async function resetPassWord(options?: { [key: string]: any }) {
 
 /** 根据id获取用户信息 GET /api/user/delUserInfoByUserId */
 export async function delUserInfoByUserId(options: { userId: string }) {
-  return request('/backend/api/user/delUserInfoByUserId?userId=' + options.userId , {
+  return request('/backend/api/user/delUserInfoByUserId?userId=' + options.userId, {
     method: 'GET',
   });
 }

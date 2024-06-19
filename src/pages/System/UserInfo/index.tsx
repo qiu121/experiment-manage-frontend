@@ -97,20 +97,20 @@ const ProjectType: React.FC = () => {
       setIsAddModalOpen(false);
       userInfoForm.resetFields();
       getAllUserInfoToll();
-    } else if (res.code === 100002) {
+    } else if (res.code === 30001) {
       messageApi.open({ type: 'warning', content: '密码长度小于8位！' });
-    } else if (res.code === 100003) {
+    } else if (res.code === 30002) {
       messageApi.open({ type: 'warning', content: '账号已存在！' });
     } else {
-      messageApi.open({ type: 'error', content: '账号新增失败！' });
+      messageApi.open({ type: 'error', content: res.msg });
     }
   };
 
-  // 更新
+  // 查询
   const [isModifyModalOpen, setIsModifyModalOpen] = useState(false);
   const [userId, setUserId] = useState<string>("");
   const modifyUserInfoModal = async (userId: string) => {
-    const res = await getUserInfoByUserId({ userId: userId })
+    const res = await getUserInfoByUserId(userId)
     if (res.code === 200) {
       setUserId(userId);
       userInfoForm.setFieldsValue({ ...res.data.userInfo });
@@ -136,7 +136,7 @@ const ProjectType: React.FC = () => {
       setIsModifyModalOpen(false);
       getAllUserInfoToll()
     } else {
-      messageApi.open({ type: 'error', content: '更新失败！' });
+      messageApi.open({ type: 'error', content: res.msg });
     }
   };
 
@@ -162,11 +162,11 @@ const ProjectType: React.FC = () => {
       ),
     },
     {
-       title: '名称', 
+      title: '名称',
       dataIndex: 'name',
-       key: 'name' ,
-       align:"center",
-      },
+      key: 'name',
+      align: "center",
+    },
     {
       title: '角色',
       dataIndex: 'role',
@@ -198,7 +198,7 @@ const ProjectType: React.FC = () => {
       dataIndex: 'operate',
       key: 'operate',
       // width: '130px',
-      align:"center",
+      align: "center",
       render: (_: any, record: any) => (
         <Space size="middle">
           <a onClick={() => modifyUserInfoModal(record.userId)}>更新</a>
@@ -296,10 +296,10 @@ const ProjectType: React.FC = () => {
                 { value: 1, label: '维护人员' },
                 { value: 2, label: '用户' },
               ]}
-              // options={SpeechRecognitionResultList.map(item:any)=>({
-              //   value:item.id,
-              //   label:item.roleName,
-              // })}
+            // options={SpeechRecognitionResultList.map(item:any)=>({
+            //   value:item.id,
+            //   label:item.roleName,
+            // })}
             />
           </Form.Item>
           <Form.Item name="phone" label="手机号码" rules={[{ required: true }]}>
@@ -345,7 +345,8 @@ const ProjectType: React.FC = () => {
               style={{ width: '100%' }}
               options={[
                 { value: 0, label: '系统管理员' },
-                { value: 1, label: '项目管理员' }
+                { value: 1, label: '维护人员' },
+                { value: 2, label: '用户' }
               ]}
             />
           </Form.Item>
