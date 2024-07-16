@@ -55,7 +55,7 @@ export default [
   },
 
   {
-    path: '/management/record/:userId',
+    path: '/management/record/:userIdParam',
     access: 'AccountManagement',
     name: 'management.record.detail',
     hideInMenu: true,

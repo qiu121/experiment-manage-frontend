@@ -1,7 +1,7 @@
 import { ProCard, ProTable } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import * as recordApi from '@/services/api/record';
-import { Link } from 'umi';
+import { Link } from '@umijs/max';
 
 import {
   Button,

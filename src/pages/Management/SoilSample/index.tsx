@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'umi';
 import { ProCard, ProForm, ProTable } from '@ant-design/pro-components';
 import * as soilSampleApi from '@/services/api/soilSample';
 import * as sampleTypeApi from '@/services/api/sampleType';
-import { useModel } from '@umijs/max';
+import { useModel, useParams, Link } from '@umijs/max';
 
 import {
   Button,
@@ -44,7 +43,10 @@ export default () => {
   const [pageSize, setPageSize] = useState<number>(10)
 
 
-  let userId = localStorage.getItem('userId')
+  // let userId = localStorage.getItem('userId')
+  // const { userId } = useUserModel(); // 使用 useUserModel hook 获取 userId
+  const {userId} = useModel('userModel')
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -134,9 +136,9 @@ export default () => {
   }
 
 
-  const getAllSoilSample = async (page:number,size:number) => {
+  const getAllSoilSample = async (page: number, size: number) => {
 
-    const result = await soilSampleApi.list({ currentPage:page, pageSize :size}, recordId)
+    const result = await soilSampleApi.list({ currentPage: page, pageSize: size }, recordId)
 
     if (result.code === 200) {
       const data = result.data.result
@@ -157,7 +159,10 @@ export default () => {
 
 
   const init = async () => {
-    await getAllSoilSample(currentPage,pageSize)
+
+    // console.log(userId);
+
+    await getAllSoilSample(currentPage, pageSize)
     await listSampleType()
   }
   useEffect(() => {
@@ -348,7 +353,7 @@ export default () => {
           // console.log(param);
 
           await soilSampleApi.update(param);
-          await getAllSoilSample(currentPage,pageSize)
+          await getAllSoilSample(currentPage, pageSize)
           setModalStatus('')
           setIsModalOpen(false)
 

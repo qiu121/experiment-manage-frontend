@@ -15,6 +15,7 @@ import {
   Tag,
 } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+import useUserModel from '@/models/userModel';
 
 
 export default () => {
@@ -37,7 +38,11 @@ export default () => {
   const [dataTotal, setDataTotal] = useState<number>()
 
   // const userIdParam = useParams()
-  const { userId } = useParams()
+  const { userIdParam } = useParams()
+
+  // const { setUserId } = useUserModel(); // 使用 useUserModel hook 中的 setUserId
+  const { setUserId } = useModel('userModel')
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -73,14 +78,16 @@ export default () => {
 
   const getAllRecord = async (currentPage:number,pageSize:number) => {
 
-    const result = await recordApi.listRecordByUserId({currentPage,pageSize},userId)
+    const result = await recordApi.listRecordByUserId({ currentPage, pageSize }, userIdParam)
 
     if (result.code === 200) {
       const data = result.data.result
-      const total =result.data.total
+      const total = result.data.total
 
       let { userId } = data[0]
-      localStorage.setItem('userId',userId)
+
+      setUserId(userId); // 将 userId 存储到 userModel 中
+      // localStorage.setItem('userId',userId)
 
       setDataTotal(total)
       setTableList(data)
@@ -222,7 +229,7 @@ export default () => {
             data: formDataObj
           }
           await recordApi.update(param);
-          await getAllRecord(currentPage,pageSize)
+          await getAllRecord(currentPage, pageSize)
           setModalStatus('')
           setIsModalOpen(false)
 
@@ -291,24 +298,24 @@ export default () => {
 
             search={false}
             pagination={
-            {
-              total: dataTotal,
-              pageSize: pageSize,
-              current: currentPage,
-              showQuickJumper: true,
-              showSizeChanger: true,
-              hideOnSinglePage: false,
+              {
+                total: dataTotal,
+                pageSize: pageSize,
+                current: currentPage,
+                showQuickJumper: true,
+                showSizeChanger: true,
+                hideOnSinglePage: false,
 
-              onChange: (page, size) => {
+                onChange: (page, size) => {
 
-                setCurrentPage(page)
-                setPageSize(size)
-                getAllRecord(page, size)
+                  setCurrentPage(page)
+                  setPageSize(size)
+                  getAllRecord(page, size)
 
-              },
+                },
 
+              }
             }
-          }
 
           />
           {/* edit & add */}
